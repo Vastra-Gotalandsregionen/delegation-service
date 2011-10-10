@@ -46,8 +46,6 @@ public class Delegation extends AbstractEntity<Long> implements se.vgregion.dao.
     private String delegateFor;
     @ElementCollection
     private List<String> delegateTo;
-    @ElementCollection
-    private List<String> delegateToGroup;
 
     @Column(unique = false, nullable = false, updatable = false)
     @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
@@ -63,4 +61,6 @@ public class Delegation extends AbstractEntity<Long> implements se.vgregion.dao.
     public Long getId() {
         return id;
     }
+
+
 }
