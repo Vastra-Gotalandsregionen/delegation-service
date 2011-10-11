@@ -30,11 +30,13 @@
        ">
   
   <context:annotation-config />
-  <context:component-scan base-package="se.vgregion.delegation.persistence.jpa" />
+  <!--<context:component-scan base-package="se.vgregion.delegation.persistence.jpa" />-->
 
   <import resource="classpath*:test-jpa-delegation-service-configuration.xml"/>
 
   <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
         p:location="classpath:test-datasource.properties" />
+
+  <bean id="delegationRepository" class="se.vgregion.delegation.persistence.jpa.JpaDelegationRepository" />
 
 </beans>

@@ -20,7 +20,7 @@ public class DelegationServiceImpl implements DelegationService {
 
     @Override
     public List<Delegation> delegatedBy(String vcVgrId) {
-        return new ArrayList<Delegation>();
+        return delegationRepository.delegatedBy(vcVgrId);
     }
 
     @Override
