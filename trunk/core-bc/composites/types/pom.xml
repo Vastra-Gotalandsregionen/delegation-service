@@ -54,11 +54,15 @@ Generation time : 2011-10-07 13:31:17 CEST
       <groupId>cglib</groupId>
       <artifactId>cglib-nodep</artifactId>
     </dependency>
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm</artifactId>
+    </dependency>
 
     <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time-hibernate</artifactId>
-      <version>1.2</version>
+      <groupId>org.jadira.usertype</groupId>
+      <artifactId>usertype.jodatime</artifactId>
+      <version>1.9</version>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>
