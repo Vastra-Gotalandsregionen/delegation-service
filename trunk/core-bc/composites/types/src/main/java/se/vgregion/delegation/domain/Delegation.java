@@ -24,6 +24,7 @@ import se.vgregion.dao.domain.patterns.entity.*;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -33,7 +34,8 @@ import java.util.List;
  */
 @Entity
 @Table(name = "vgr_delegation")
-public class Delegation extends AbstractEntity<Long> implements se.vgregion.dao.domain.patterns.entity.Entity<Long> {
+public class Delegation extends AbstractEntity<Long>
+        implements se.vgregion.dao.domain.patterns.entity.Entity<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
