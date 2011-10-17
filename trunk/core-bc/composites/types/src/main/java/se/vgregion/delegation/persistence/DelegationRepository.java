@@ -30,6 +30,7 @@ import java.util.List;
  * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
  */
 public interface DelegationRepository extends Repository<Delegation, Long> {
+    List<Delegation> activeDelegations(String vcVgrId);
     List<Delegation> delegatedBy(String vcVgrId);
     List<Delegation> delegatedBy(String vcVgrId, Date on);
 }

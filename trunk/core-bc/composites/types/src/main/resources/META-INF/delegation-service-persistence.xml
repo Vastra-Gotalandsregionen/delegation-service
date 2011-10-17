@@ -25,5 +25,6 @@
 	version="2.0">
   <persistence-unit name="delegation">
     <class>se.vgregion.delegation.domain.Delegation</class>
+    <class>se.vgregion.delegation.domain.DelegationTo</class>
   </persistence-unit>
 </persistence>

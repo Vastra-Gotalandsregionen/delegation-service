@@ -20,19 +20,14 @@
 package se.vgregion.delegation.persistence.jpa;
 
 import org.joda.time.DateTime;
-import org.joda.time.LocalDateTime;
-import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import se.vgregion.delegation.domain.Delegation;
 import se.vgregion.delegation.persistence.DelegationRepository;
 
-import javax.persistence.EntityManager;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -61,7 +56,7 @@ public class JpaDelegationRepositoryTest extends AbstractTransactionalJUnit4Spri
     @Test
     public void testFindAll() {
         Collection<Delegation> delegations = jpaDelegationRepository.findAll();
-        assertEquals(6, delegations.size());
+        assertEquals(8, delegations.size());
 
         for (Delegation delegation: delegations) {
             System.out.println(delegation);
@@ -76,13 +71,6 @@ public class JpaDelegationRepositoryTest extends AbstractTransactionalJUnit4Spri
         System.out.println(on);
         List<Delegation> delegations = jpaDelegationRepository.delegatedBy("delegatedBy", on);
 
-        for (Delegation delegation: delegations) {
-            assertEquals("delegatedBy", delegation.getDelegatedBy());
-            assertThat(new DateTime(delegation.getApproved()), lessThan(dateTime));
-            assertThat(new DateTime(delegation.getValidFrom()), lessThan(dateTime));
-            assertThat(new DateTime(delegation.getValidTo()), greaterThan(dateTime));
-        }
-
-        assertEquals(2, delegations.size());
+        assertEquals(1, delegations.size());
     }
 }
