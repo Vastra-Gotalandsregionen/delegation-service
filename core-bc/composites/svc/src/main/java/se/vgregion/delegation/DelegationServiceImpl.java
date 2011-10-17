@@ -6,6 +6,7 @@ import se.vgregion.delegation.domain.Delegation;
 import se.vgregion.delegation.persistence.DelegationRepository;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,8 +20,18 @@ public class DelegationServiceImpl implements DelegationService {
     private DelegationRepository delegationRepository;
 
     @Override
+    public List<Delegation> activeDelegations(String vcVgrId) {
+        return delegationRepository.activeDelegations(vcVgrId);
+    }
+
+    @Override
     public List<Delegation> delegatedBy(String vcVgrId) {
         return delegationRepository.delegatedBy(vcVgrId);
+    }
+
+    @Override
+    public List<Delegation> delegatedBy(String vcVgrId, DateTime on) {
+        return delegationRepository.delegatedBy(vcVgrId, new Date(on.getMillis()));
     }
 
     @Override
@@ -48,10 +59,9 @@ public class DelegationServiceImpl implements DelegationService {
      * Validate that signToken is signed by signer.
      *
      * @param delegation
-     * @param signToken
      * @return
      */
-    private boolean validateSignToken(Delegation delegation, String signToken) {
+    private boolean validateSigning(Delegation delegation) {
         return false;
     }
 }

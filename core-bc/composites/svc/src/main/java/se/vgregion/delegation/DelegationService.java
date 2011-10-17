@@ -12,7 +12,30 @@ import java.util.List;
  * Time: 16:43
  */
 public interface DelegationService {
+    /**
+     * Fetch all currently active delegations made by Verksamhets-Chef.
+     *
+     * @param vcVgrId - vgrId for Verksamhets-Chef
+     * @return - a list of active delegations
+     */
+    List<Delegation> activeDelegations(String vcVgrId);
+
+    /**
+     * Fetch all delegations made by Verksamhets-Chef.
+     *
+     * @param vcVgrId - vgrId for Verksamhets-Chef
+     * @return - a list of all delegations
+     */
     List<Delegation> delegatedBy(String vcVgrId);
+
+    /**
+     * Fetch all delegations that where active on a specific date made by Verksamhets-Chef.
+     *
+     * @param vcVgrId - vgrId for Verksamhets-Chef
+     * @param on - the date
+     * @return - a list of delegations that where active on a specific date
+     */
+    List<Delegation> delegatedBy(String vcVgrId, DateTime on);
 
     List<Delegation> delegatedTo(String vgrId);
 

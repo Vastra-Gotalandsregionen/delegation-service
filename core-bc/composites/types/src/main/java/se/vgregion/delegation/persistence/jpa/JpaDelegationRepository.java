@@ -19,10 +19,10 @@
 
 package se.vgregion.delegation.persistence.jpa;
 
-import org.joda.time.LocalDateTime;
 import org.springframework.stereotype.Repository;
 import se.vgregion.dao.domain.patterns.repository.db.jpa.DefaultJpaRepository;
 import se.vgregion.delegation.domain.Delegation;
+import se.vgregion.delegation.domain.DelegationStatus;
 import se.vgregion.delegation.persistence.DelegationRepository;
 
 import javax.persistence.Query;
@@ -36,20 +36,47 @@ import java.util.List;
 public class JpaDelegationRepository extends DefaultJpaRepository<Delegation, Long> implements DelegationRepository {
 
     @Override
-    public List<Delegation> delegatedBy(String vcVgrId) {
+    public List<Delegation> activeDelegations(String vcVgrId) {
         Date now = new Date();
-
-        return delegatedBy(vcVgrId, now);
-    }
-
-    public List<Delegation> delegatedBy(String vcVgrId, Date time) {
         String query = "SELECT d FROM Delegation d " +
                 "WHERE d.delegatedBy = :delegatedBy" +
-                " AND d.approved < :time " +
-                " AND d.validFrom < :time AND d.validTo > :time" +
+                " AND d.approvedOn < :time" +
+                " AND d.revokedOn IS NULL" +
+                " AND d.status = :active" +
                 "";
         Query q = entityManager.createQuery(query);
 
-        return q.setParameter("delegatedBy", vcVgrId).setParameter("time", time).getResultList();
+        return q.setParameter("delegatedBy", vcVgrId)
+                .setParameter("time", now)
+                .setParameter("active", DelegationStatus.ACTIVE)
+                .getResultList();
+    }
+
+    @Override
+    public List<Delegation> delegatedBy(String vcVgrId) {
+        String query = "SELECT d FROM Delegation d " +
+                "WHERE d.delegatedBy = :delegatedBy" +
+                "";
+        Query q = entityManager.createQuery(query);
+
+        return q.setParameter("delegatedBy", vcVgrId).getResultList();
+    }
+
+    @Override
+    public List<Delegation> delegatedBy(String vcVgrId, Date time) {
+        String query = "SELECT d FROM Delegation d " +
+                "WHERE d.delegatedBy = :delegatedBy" +
+                " AND (" +
+                "  (d.approvedOn < :time AND d.revokedOn > :time AND d.status = :superseded)" +
+                "  OR (d.approvedOn < :time AND d.revokedOn IS NULL AND d.status = :active)" +
+                " )" +
+                "";
+        Query q = entityManager.createQuery(query);
+
+        return q.setParameter("delegatedBy", vcVgrId)
+                .setParameter("time", time)
+                .setParameter("superseded", DelegationStatus.SUPERSEDED)
+                .setParameter("active", DelegationStatus.ACTIVE)
+                .getResultList();
     }
 }
