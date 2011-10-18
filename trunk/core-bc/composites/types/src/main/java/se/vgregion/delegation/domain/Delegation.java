@@ -25,7 +25,7 @@ public class Delegation extends AbstractEntity<Long>
 
     private String delegatedBy;
 
-    @OneToMany(mappedBy = "delegationBy")
+    @OneToMany(mappedBy = "delegation")
     private Collection<DelegationTo> delegationsTo;
 
     @Column(unique = false, nullable = true, updatable = false)
@@ -40,10 +40,10 @@ public class Delegation extends AbstractEntity<Long>
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
 
-    public void addDelegationEntry(DelegationTo delegationTo) {
+    public void addDelegationTo(DelegationTo delegationTo) {
         if (!getDelegationsTo().contains(delegationTo)) {
             getDelegationsTo().add(delegationTo);
-            delegationTo.setDelegationBy(this);
+            delegationTo.setDelegation(this);
         }
     }
 

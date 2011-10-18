@@ -27,6 +27,9 @@ import java.util.List;
 
 
 /**
+ * Created by IntelliJ IDEA.
+ * Created: 2011-10-18 11:29
+ *
  * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
  */
 public interface DelegationRepository extends Repository<Delegation, Long> {
@@ -34,4 +37,6 @@ public interface DelegationRepository extends Repository<Delegation, Long> {
     List<Delegation> delegatedBy(String vcVgrId);
     Delegation delegatedOn(String vcVgrId, Date on);
     Delegation pendingDelegation(String vcVgrId);
+
+    Delegation clone(Delegation delegation);
 }

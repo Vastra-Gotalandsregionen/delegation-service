@@ -9,6 +9,11 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="false" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+
+<style type="text/css">
+    <%@ include file="/css/delegation.css" %>
+</style>
+
 <div>
     <h1>Hej Delegering</h1>
 </div>
