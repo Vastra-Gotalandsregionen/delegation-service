@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import se.vgregion.delegation.domain.Delegation;
 import se.vgregion.delegation.persistence.DelegationRepository;
+import se.vgregion.delegation.persistence.DelegationToRepository;
 
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
@@ -22,6 +23,9 @@ public class DelegationServiceImpl implements DelegationService {
 
     @Autowired
     private DelegationRepository delegationRepository;
+
+    @Autowired
+    private DelegationToRepository delegationToRepository;
 
     @Override
     public Delegation activeDelegations(String vcVgrId) {
@@ -54,15 +58,38 @@ public class DelegationServiceImpl implements DelegationService {
         }
     }
 
+    /**
+     * Fetch the pending delegation made by Verksamhets-Chef.
+     * If no pending delegation found, copy active delegation and return that.
+     *
+     * @param vcVgrId - vgrId for Verksamhets-Chef
+     * @return
+     */
+    @Override
+    public Delegation pendingDelegation(String vcVgrId) {
+        Delegation delegation = null;
+        try {
+            delegation = delegationRepository.pendingDelegation(vcVgrId);
+        } catch (NoResultException ex) {
+            Delegation activeDelegation = activeDelegations(vcVgrId);
+            if (activeDelegation == null) {
+                delegation = new Delegation();
+            } else {
+                delegation = delegationRepository.clone(activeDelegation);
+            }
+        } catch (NonUniqueResultException ex) {
+            LOGGER.error("Delegation databas is in an inconsistent state, " +
+                    "there where multiple PENDING delegations for VerksamhetChef ["+vcVgrId+"]");
+            throw new RuntimeException(ex);
+        }
+        return delegation;
+    }
+
     @Override
     public List<Delegation> delegatedTo(String vgrId) {
         return new ArrayList<Delegation>();
     }
 
-    @Override
-    public List<Delegation> delegationsInProgress(String vcVgrId) {
-        return new ArrayList<Delegation>();
-    }
 
     @Override
     public boolean approve(Delegation delegation, String signToken) {

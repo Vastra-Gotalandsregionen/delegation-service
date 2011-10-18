@@ -19,10 +19,12 @@
 
 package se.vgregion.delegation.persistence.jpa;
 
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
 import se.vgregion.dao.domain.patterns.repository.db.jpa.DefaultJpaRepository;
 import se.vgregion.delegation.domain.Delegation;
 import se.vgregion.delegation.domain.DelegationStatus;
+import se.vgregion.delegation.domain.DelegationTo;
 import se.vgregion.delegation.persistence.DelegationRepository;
 
 import javax.persistence.Query;
@@ -30,10 +32,14 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * Created by IntelliJ IDEA.
+ * Created: 2011-10-18 11:29
+ *
  * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
  */
 @Repository
-public class JpaDelegationRepository extends DefaultJpaRepository<Delegation, Long> implements DelegationRepository {
+public class JpaDelegationRepository extends DefaultJpaRepository<Delegation, Long>
+        implements DelegationRepository {
 
     @Override
     public Delegation activeDelegation(String vcVgrId) {
@@ -89,7 +95,20 @@ public class JpaDelegationRepository extends DefaultJpaRepository<Delegation, Lo
         Query q = entityManager.createQuery(query);
 
         return (Delegation) q.setParameter("delegatedBy", vcVgrId)
-                .setParameter("in_progress", DelegationStatus.IN_PROGRESS)
+                .setParameter("in_progress", DelegationStatus.PENDING)
                 .getSingleResult();
+    }
+
+    @Override
+    public Delegation clone(Delegation delegation) {
+        Delegation pending = new Delegation();
+        pending.setStatus(DelegationStatus.PENDING);
+
+        pending.setDelegatedBy(delegation.getDelegatedBy());
+        for (DelegationTo delegationTo: delegation.getDelegationsTo()) {
+            delegationTo.clearId();
+            pending.addDelegationTo(delegationTo);
+        }
+        return pending;
     }
 }

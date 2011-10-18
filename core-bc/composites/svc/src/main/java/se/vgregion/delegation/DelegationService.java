@@ -16,7 +16,7 @@ public interface DelegationService {
      * Fetch currently active delegations made by Verksamhets-Chef.
      *
      * @param vcVgrId - vgrId for Verksamhets-Chef
-     * @return - a list of active delegations
+     * @return - the active delegation
      */
     Delegation activeDelegations(String vcVgrId);
 
@@ -29,17 +29,17 @@ public interface DelegationService {
     List<Delegation> delegatedBy(String vcVgrId);
 
     /**
-     * Fetch delegations that where active on a specific date made by Verksamhets-Chef.
+     * Fetch the delegation made by Verksamhets-Chef, that where active on a specific date.
      *
      * @param vcVgrId - vgrId for Verksamhets-Chef
      * @param on - the date
-     * @return - a list of delegations that where active on a specific date
+     * @return - the delegations that where active on a specific date
      */
     Delegation delegatedBy(String vcVgrId, DateTime on);
 
-    List<Delegation> delegatedTo(String vgrId);
+    Delegation pendingDelegation(String vcVgrId);
 
-    List<Delegation> delegationsInProgress(String vcVgrId);
+    List<Delegation> delegatedTo(String vgrId);
 
     boolean approve(Delegation delegation, String signToken);
 

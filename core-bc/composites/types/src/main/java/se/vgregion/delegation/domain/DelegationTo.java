@@ -6,6 +6,9 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
+ * Created by IntelliJ IDEA.
+ * Created: 2011-10-18 11:29
+ *
  * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
  */
 @Entity
@@ -17,7 +20,7 @@ public class DelegationTo extends AbstractEntity<Long>
     private Long id;
 
     @ManyToOne
-    private Delegation delegationBy;
+    private Delegation delegation;
 
     private String delegatedFor;
     private String delegateTo;
@@ -28,6 +31,10 @@ public class DelegationTo extends AbstractEntity<Long>
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Date validTo;
+
+    public void clearId() {
+        this.id = null;
+    }
 
     @Override
     public Long getId() {
@@ -50,12 +57,12 @@ public class DelegationTo extends AbstractEntity<Long>
         this.delegateTo = delegateTo;
     }
 
-    public Delegation getDelegationBy() {
-        return delegationBy;
+    public Delegation getDelegation() {
+        return delegation;
     }
 
-    public void setDelegationBy(Delegation delegationBy) {
-        this.delegationBy = delegationBy;
+    public void setDelegation(Delegation delegation) {
+        this.delegation = delegation;
     }
 
     public Date getValidFrom() {
@@ -78,7 +85,7 @@ public class DelegationTo extends AbstractEntity<Long>
     public String toString() {
         return "DelegationTo{" +
                 "id=" + id +
-                ", delegationBy=" + delegationBy.getId() +
+                ", delegationBy=" + delegation.getId() +
                 ", delegatedFor='" + delegatedFor + '\'' +
                 ", delegateTo='" + delegateTo + '\'' +
                 ", validFrom=" + validFrom +

@@ -6,7 +6,7 @@ package se.vgregion.delegation.domain;
 public enum DelegationStatus {
 
     /** New delegation - not yet approved */
-    IN_PROGRESS,
+    PENDING,
 
     /** Signed delegation - currently active (only one per VerksamhetsChef and OrganizationUnit) */
     ACTIVE,
