@@ -24,7 +24,6 @@ public class Delegation extends AbstractEntity<Long>
     private String signToken;
 
     private String delegatedBy;
-    private String delegatedFor;
 
     @OneToMany(mappedBy = "delegationBy")
     private Collection<DelegationTo> delegationsTo;
@@ -77,14 +76,6 @@ public class Delegation extends AbstractEntity<Long>
         this.delegatedBy = delegatedBy;
     }
 
-    public String getDelegatedFor() {
-        return delegatedFor;
-    }
-
-    public void setDelegatedFor(String delegatedFor) {
-        this.delegatedFor = delegatedFor;
-    }
-
     public Collection<DelegationTo> getDelegationsTo() {
         return delegationsTo;
     }
@@ -117,9 +108,8 @@ public class Delegation extends AbstractEntity<Long>
     public String toString() {
         return "Delegation{" +
                 "id=" + id +
+                ", status='" + status + '\'' +
                 ", delegatedBy='" + delegatedBy + '\'' +
-                ", delegatedFor='" + delegatedFor + '\'' +
-                ", status=" + status +
                 ", approvedOn=" + approvedOn +
                 ", signToken='" + signToken + '\'' +
                 ", revokedOn=" + revokedOn +

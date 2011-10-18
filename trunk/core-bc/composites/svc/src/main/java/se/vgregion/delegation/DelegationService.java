@@ -13,12 +13,12 @@ import java.util.List;
  */
 public interface DelegationService {
     /**
-     * Fetch all currently active delegations made by Verksamhets-Chef.
+     * Fetch currently active delegations made by Verksamhets-Chef.
      *
      * @param vcVgrId - vgrId for Verksamhets-Chef
      * @return - a list of active delegations
      */
-    List<Delegation> activeDelegations(String vcVgrId);
+    Delegation activeDelegations(String vcVgrId);
 
     /**
      * Fetch all delegations made by Verksamhets-Chef.
@@ -29,13 +29,13 @@ public interface DelegationService {
     List<Delegation> delegatedBy(String vcVgrId);
 
     /**
-     * Fetch all delegations that where active on a specific date made by Verksamhets-Chef.
+     * Fetch delegations that where active on a specific date made by Verksamhets-Chef.
      *
      * @param vcVgrId - vgrId for Verksamhets-Chef
      * @param on - the date
      * @return - a list of delegations that where active on a specific date
      */
-    List<Delegation> delegatedBy(String vcVgrId, DateTime on);
+    Delegation delegatedBy(String vcVgrId, DateTime on);
 
     List<Delegation> delegatedTo(String vgrId);
 

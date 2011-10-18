@@ -36,7 +36,7 @@ import java.util.List;
 public class JpaDelegationRepository extends DefaultJpaRepository<Delegation, Long> implements DelegationRepository {
 
     @Override
-    public List<Delegation> activeDelegations(String vcVgrId) {
+    public Delegation activeDelegation(String vcVgrId) {
         Date now = new Date();
         String query = "SELECT d FROM Delegation d " +
                 "WHERE d.delegatedBy = :delegatedBy" +
@@ -46,10 +46,10 @@ public class JpaDelegationRepository extends DefaultJpaRepository<Delegation, Lo
                 "";
         Query q = entityManager.createQuery(query);
 
-        return q.setParameter("delegatedBy", vcVgrId)
+        return (Delegation) q.setParameter("delegatedBy", vcVgrId)
                 .setParameter("time", now)
                 .setParameter("active", DelegationStatus.ACTIVE)
-                .getResultList();
+                .getSingleResult();
     }
 
     @Override
@@ -63,7 +63,7 @@ public class JpaDelegationRepository extends DefaultJpaRepository<Delegation, Lo
     }
 
     @Override
-    public List<Delegation> delegatedBy(String vcVgrId, Date time) {
+    public Delegation delegatedOn(String vcVgrId, Date time) {
         String query = "SELECT d FROM Delegation d " +
                 "WHERE d.delegatedBy = :delegatedBy" +
                 " AND (" +
@@ -73,10 +73,23 @@ public class JpaDelegationRepository extends DefaultJpaRepository<Delegation, Lo
                 "";
         Query q = entityManager.createQuery(query);
 
-        return q.setParameter("delegatedBy", vcVgrId)
+        return (Delegation) q.setParameter("delegatedBy", vcVgrId)
                 .setParameter("time", time)
                 .setParameter("superseded", DelegationStatus.SUPERSEDED)
                 .setParameter("active", DelegationStatus.ACTIVE)
-                .getResultList();
+                .getSingleResult();
+    }
+
+    @Override
+    public Delegation pendingDelegation(String vcVgrId) {
+        String query = "SELECT d FROM Delegation d " +
+                "WHERE d.delegatedBy = :delegatedBy" +
+                " AND d.status = :in_progress" +
+                "";
+        Query q = entityManager.createQuery(query);
+
+        return (Delegation) q.setParameter("delegatedBy", vcVgrId)
+                .setParameter("in_progress", DelegationStatus.IN_PROGRESS)
+                .getSingleResult();
     }
 }

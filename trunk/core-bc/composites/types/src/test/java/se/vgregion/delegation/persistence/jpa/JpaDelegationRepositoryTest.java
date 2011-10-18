@@ -33,9 +33,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static se.vgregion.hamcrest.ComparableMatcher.greaterThan;
 import static se.vgregion.hamcrest.ComparableMatcher.lessThan;
 
@@ -56,21 +54,72 @@ public class JpaDelegationRepositoryTest extends AbstractTransactionalJUnit4Spri
     @Test
     public void testFindAll() {
         Collection<Delegation> delegations = jpaDelegationRepository.findAll();
-        assertEquals(8, delegations.size());
+        assertEquals(9, delegations.size());
 
         for (Delegation delegation: delegations) {
             System.out.println(delegation);
         }
     }
 
-
     @Test
-    public void testFindDelegatedBy() {
-        DateTime dateTime = new DateTime(2011, 10, 2, 10, 0, 0, 0);
+    public void testFindDelegatedOn() {
+        DateTime dateTime = new DateTime(2011, 9, 2, 10, 0, 0, 0);
         Date on = new Date(dateTime.getMillis());
         System.out.println(on);
-        List<Delegation> delegations = jpaDelegationRepository.delegatedBy("delegatedBy", on);
+        Delegation delegation = jpaDelegationRepository.delegatedOn("delegatedBy", on);
 
-        assertEquals(1, delegations.size());
+        assertNotNull(delegation);
+        assertEquals(new Long(-1), delegation.getId());
+    }
+
+    @Test(expected = javax.persistence.NoResultException.class)
+    public void testFindDelegatedOn2() {
+        DateTime dateTime = new DateTime(2011, 8, 2, 10, 0, 0, 0);
+        Date on = new Date(dateTime.getMillis());
+        Delegation delegation = jpaDelegationRepository.delegatedOn("delegatedBy", on);
+    }
+
+    @Test
+    public void testFindCurrentDelegation() {
+        Delegation delegation = jpaDelegationRepository.activeDelegation("delegatedBy");
+
+        assertNotNull(delegation);
+        assertEquals(new Long(-2), delegation.getId());
+    }
+
+    @Test
+    public void testFindCurrentDelegation2() {
+        Delegation delegation = jpaDelegationRepository.activeDelegation("delegatedBy2");
+
+        assertNotNull(delegation);
+        assertEquals(new Long(-7), delegation.getId());
+    }
+
+    @Test(expected = javax.persistence.NoResultException.class)
+    public void testFindCurrentDelegation3() {
+        Delegation delegation = jpaDelegationRepository.activeDelegation("delegatedBy3");
+    }
+
+    @Test(expected = javax.persistence.NonUniqueResultException.class)
+    public void testFindPendingDelegation() {
+        Delegation delegation = jpaDelegationRepository.pendingDelegation("delegatedBy");
+    }
+
+    @Test(expected = javax.persistence.NoResultException.class)
+    public void testFindPendingDelegation2() {
+        Delegation delegation = jpaDelegationRepository.pendingDelegation("delegatedBy2");
+    }
+
+    @Test(expected = javax.persistence.NoResultException.class)
+    public void testFindPendingDelegation3() {
+        Delegation delegation = jpaDelegationRepository.pendingDelegation("delegatedBy3");
+    }
+
+    @Test
+    public void testFindPendingDelegation4() {
+        Delegation delegation = jpaDelegationRepository.pendingDelegation("delegatedBy4");
+
+        assertNotNull(delegation);
+        assertEquals(new Long(-9), delegation.getId());
     }
 }
