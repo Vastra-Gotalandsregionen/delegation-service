@@ -19,6 +19,7 @@ public class DelegationTo extends AbstractEntity<Long>
     @ManyToOne
     private Delegation delegationBy;
 
+    private String delegatedFor;
     private String delegateTo;
 
     @Column
@@ -31,6 +32,14 @@ public class DelegationTo extends AbstractEntity<Long>
     @Override
     public Long getId() {
         return id;
+    }
+
+    public String getDelegatedFor() {
+        return delegatedFor;
+    }
+
+    public void setDelegatedFor(String delegatedFor) {
+        this.delegatedFor = delegatedFor;
     }
 
     public String getDelegateTo() {
@@ -70,6 +79,7 @@ public class DelegationTo extends AbstractEntity<Long>
         return "DelegationTo{" +
                 "id=" + id +
                 ", delegationBy=" + delegationBy.getId() +
+                ", delegatedFor='" + delegatedFor + '\'' +
                 ", delegateTo='" + delegateTo + '\'' +
                 ", validFrom=" + validFrom +
                 ", validTo=" + validTo +
