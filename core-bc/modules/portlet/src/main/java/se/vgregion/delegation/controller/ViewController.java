@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import se.vgregion.delegation.DelegationService;
@@ -32,12 +33,14 @@ public class ViewController {
     private DelegationService delegationService;
 
     @RenderMapping
-    public String showView(RenderRequest request) {
+    public String showView(RenderRequest request, Model model) {
         String uid = lookupUid(request);
 
         Delegation activeDelegation = delegationService.activeDelegations(uid);
         Delegation pendingDelegation = delegationService.pendingDelegation(uid);
 
+        model.addAttribute("sign_clientType", "BankId");
+        model.addAttribute("sign_submitUri", "http://localhost:9090/saveSignature");
 
         return "view";
     }

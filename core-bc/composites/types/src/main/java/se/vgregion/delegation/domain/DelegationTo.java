@@ -85,7 +85,7 @@ public class DelegationTo extends AbstractEntity<Long>
     public String toString() {
         return "DelegationTo{" +
                 "id=" + id +
-                ", delegationBy=" + delegation.getId() +
+                ", delegation=" + delegation.getId() +
                 ", delegatedFor='" + delegatedFor + '\'' +
                 ", delegateTo='" + delegateTo + '\'' +
                 ", validFrom=" + validFrom +
