@@ -8,18 +8,18 @@ import java.util.Collection;
  *
  * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
  */
-public class VerksamhetsChef {
-    Personal personal;
+public class VerksamhetsChefInfo {
+    PersonalInfo verksamhetsChef;
     HealthCareUnit vardEnhet;
     Collection<HealthCareUnit> ingaendeEnheter;
     HealthCareUnit vardGivare;
 
-    public Personal getPersonal() {
-        return personal;
+    public PersonalInfo getVerksamhetsChef() {
+        return verksamhetsChef;
     }
 
-    public void setPersonal(Personal personal) {
-        this.personal = personal;
+    public void setVerksamhetsChef(PersonalInfo verksamhetsChef) {
+        this.verksamhetsChef = verksamhetsChef;
     }
 
     public HealthCareUnit getVardEnhet() {
@@ -55,7 +55,7 @@ public class VerksamhetsChef {
         }
         memberUnitsBuffer.append("]");
 
-        return "VerksamhetsChef-{" + personal.toString()+
+        return "VerksamhetsChefInfo-{" + verksamhetsChef.toString()+
                 ", vardEnhet=" + vardEnhet.dn +
                 ", ingaendeEnheter=" + memberUnitsBuffer +
                 ", vardGivare=" + vardGivare.dn +

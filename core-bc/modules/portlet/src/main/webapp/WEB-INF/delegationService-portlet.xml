@@ -9,12 +9,13 @@
             ">
 
   <import resource="classpath*:jpa-delegation-service-configuration.xml"/>
+  <import resource="classpath*:ldap-delegation-service-configuration.xml"/>
 
   <context:annotation-config/>
   <context:component-scan base-package="se.vgregion.delegation.controller"/>
 
   <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
-        p:location="classpath:datasource.properties" />
+        p:location="classpath:datasource.properties,classpath:security.properties" />
 
   <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
     <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
@@ -27,5 +28,7 @@
 
   <bean id="delegationRepository" class="se.vgregion.delegation.persistence.jpa.JpaDelegationRepository" />
   <bean id="delegationToRepository" class="se.vgregion.delegation.persistence.jpa.JpaDelegationToRepository" />
+
+  <bean id="verksamhetsChefDao" class="se.vgregion.delegation.persistence.ldap.VerksamhetsChefDaoImpl" />
 
 </beans>

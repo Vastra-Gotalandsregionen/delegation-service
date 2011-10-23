@@ -1,7 +1,6 @@
 package se.vgregion.delegation.domain;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,7 +20,7 @@ public class HealthCareUnit {
     String[] hsaHealthCareUnitMembers;
     String hsaResponsibleHealthCareProvider;
 
-    Collection<Personal> personal;
+    Collection<PersonalInfo> personal;
 
     public String getDn() {
         return dn;
@@ -63,11 +62,11 @@ public class HealthCareUnit {
         this.labeledUri = labeledUri;
     }
 
-    public Collection<Personal> getPersonal() {
+    public Collection<PersonalInfo> getPersonal() {
         return personal;
     }
 
-    public void setPersonal(Collection<Personal> personal) {
+    public void setPersonal(Collection<PersonalInfo> personal) {
         this.personal = personal;
     }
 
