@@ -4,17 +4,12 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ldap.core.AttributesMapper;
-import org.springframework.ldap.core.ContextMapper;
-import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.LdapTemplate;
 import se.vgregion.delegation.domain.HealthCareUnit;
-import se.vgregion.delegation.domain.Personal;
-import se.vgregion.delegation.domain.VerksamhetsChef;
+import se.vgregion.delegation.domain.PersonalInfo;
+import se.vgregion.delegation.domain.VerksamhetsChefInfo;
 import se.vgregion.delegation.persistence.VerksamhetsChefDao;
 
-import javax.naming.NamingException;
-import javax.naming.directory.Attributes;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,12 +30,12 @@ public class VerksamhetsChefDaoImpl implements VerksamhetsChefDao {
     @Override
     public boolean isVerksamhetsChef(String vgrId) {
         try {
-            String hsaIdentity = lookupHsaIdentity(vgrId);
-            if (hsaIdentity == null) {
+            PersonalInfo vcInfo = lookup(vgrId);
+            if (StringUtils.isBlank(vcInfo.getHsaIdentity())) {
                 return false;
             }
-            List<String> orgDNs = lookupVerksamhetsChefHealthCareUnitDNs(hsaIdentity);
-            return orgDNs.size() > 0;
+            List<HealthCareUnit> vardEnheter = lookupVerksamhetsChefHealthCareUnitDNs(vcInfo.getHsaIdentity());
+            return vardEnheter.size() > 0;
         } catch (Exception ex) {
             LOGGER.warn("Failed to query catalog for VC status", ex);
             return false;
@@ -48,31 +43,24 @@ public class VerksamhetsChefDaoImpl implements VerksamhetsChefDao {
     }
 
     @Override
-    public List<VerksamhetsChef> find(String vcVgrId) {
-        List<VerksamhetsChef> verksamhetsChefList = new ArrayList<VerksamhetsChef>();
+    public List<VerksamhetsChefInfo> find(String vcVgrId) {
+        List<VerksamhetsChefInfo> verksamhetsChefList = new ArrayList<VerksamhetsChefInfo>();
         try {
-            String hsaIdentityVc = lookupHsaIdentity(vcVgrId);
-            if (StringUtils.isBlank(hsaIdentityVc)) {
-                String msg = format("User [%s] is not VerksamhetsChef, due to no hsaIdentity", vcVgrId);
-                LOGGER.warn(msg);
-                return verksamhetsChefList; // Empty List, no hsaIdentity found.
+            PersonalInfo vcInfo = lookup(vcVgrId);
+            if (StringUtils.isBlank(vcInfo.getHsaIdentity())) {
+                String msg = format("User [%s] is not VerksamhetsChef." +
+                        "Catalog data-error - no hsaIdentity", vcVgrId);
+                throw new RuntimeException(msg); // Empty List, no hsaIdentity found.
             }
 
-            List<String> orgDNs = lookupVerksamhetsChefHealthCareUnitDNs(hsaIdentityVc);
-            for (String orgDN : orgDNs) {
-                VerksamhetsChef vc = new VerksamhetsChef();
+            List<HealthCareUnit> vardEnhets = lookupVerksamhetsChefHealthCareUnitDNs(vcInfo.getHsaIdentity());
+            for (HealthCareUnit vardEnhet : vardEnhets) {
+                VerksamhetsChefInfo vc = new VerksamhetsChefInfo();
 
                 // 1: resolve Personal information
-                String userFilter = format("(&(objectclass=person)(uid=%s))", vcVgrId);
-                List<Personal> personalList = resolvePersonal(userFilter);
-                if (personalList.size() != 1) {
-                    String msg = format("Personal information is ambiguous for [%s]", vcVgrId);
-                    throw new RuntimeException(msg);
-                }
-                vc.setPersonal(personalList.get(0));
+                vc.setVerksamhetsChef(vcInfo);
 
                 // 2: resolve VårdEnhet information
-                HealthCareUnit vardEnhet = lookupUnit(orgDN);
                 vc.setVardEnhet(vardEnhet);
 
                 // 2b: resolve Personal for VårdEnhet
@@ -109,56 +97,34 @@ public class VerksamhetsChefDaoImpl implements VerksamhetsChefDao {
                 if (vardEnhet.getHsaHealthCareUnitMembers().length > 0) {
                     StringBuilder orClause = new StringBuilder("(| ");
                     for (String hsaIdentityUnit : vardEnhet.getHsaHealthCareUnitMembers()) {
-                        orClause.append("(").append(hsaIdentityUnit).append(")");
+                        orClause.append("(hsaIdentity=").append(hsaIdentityUnit).append(")");
                     }
                     orClause.append(")");
                     String ingaendeEnhetFilter = format("(&(objectclass=organizationalUnit)%s)", orClause);
-                    vc.setIngaendeEnheter(resolveUnit(vardGivarFilter));
+                    vc.setIngaendeEnheter(resolveUnit(ingaendeEnhetFilter));
 
                     // 4b: foreach Enhet add Personal
-                    for (HealthCareUnit enhet: vc.getIngaendeEnheter()) {
+                    for (HealthCareUnit enhet : vc.getIngaendeEnheter()) {
                         String enhetPersonalFilter = format("(&(objectclass=person)(vgrStrukturPersonDN=%s))",
                                 enhet.getDn());
                         enhet.setPersonal(resolvePersonal(enhetPersonalFilter));
                     }
                 }
+
+                // 5: OK, add to list
+                verksamhetsChefList.add(vc);
             }
             return verksamhetsChefList;
         } catch (Exception ex) {
             LOGGER.error("Failed to extract VerksamhetsChef", ex);
-            return new ArrayList<VerksamhetsChef>(); // Empty List due to data-error.
+            return new ArrayList<VerksamhetsChefInfo>(); // Empty List due to data-error.
         }
     }
 
-    private HealthCareUnit lookupUnit(String orgDN) {
-        return (HealthCareUnit) ldapTemplate.lookup(orgDN, new UnitContextMapper());
-    }
-
-    private List<HealthCareUnit> resolveUnit(String filter) {
-        String base = "ou=Org,o=vgr";
-        return (List<HealthCareUnit>) ldapTemplate.search(base, filter, new UnitContextMapper());
-    }
-
-    private List<Personal> resolvePersonal(String filter) {
-        try {
-            String base = "ou=personal,ou=anv,o=vgr";
-            return (List<Personal>) ldapTemplate.search(base, filter, new PersonalContextMapper());
-        } catch (Exception ex) {
-            String msg = format("Failed to resolvePersonal Personal information for [%s]", filter);
-            throw new RuntimeException(msg, ex);
-        }
-    }
-
-    private String lookupHsaIdentity(String vgrId) {
-        String userBase = "ou=personal,ou=anv,o=vgr";
+    private PersonalInfo lookup(String vgrId) {
         String userFilter = format("(&(objectclass=person)(uid=%s))", vgrId);
 
-        List<String> hsaIdentities = ldapTemplate.search(userBase, userFilter, new AttributesMapper() {
-            @Override
-            public Object mapFromAttributes(Attributes attributes) throws NamingException {
-                return attributes.get("hsaIdentity");
-            }
-        });
+        List<PersonalInfo> hsaIdentities = resolvePersonal(userFilter);
 
         switch (hsaIdentities.size()) {
             case 0:
@@ -172,56 +138,34 @@ public class VerksamhetsChefDaoImpl implements VerksamhetsChefDao {
         }
     }
 
-    private List<String> lookupVerksamhetsChefHealthCareUnitDNs(String hsaIdentity) {
-        String orgBase = "ou=org,o=vgr";
-        String orgFilter = format("(hsaHealthCareUnitManager=%s)", hsaIdentity);
+    private List<HealthCareUnit> lookupVerksamhetsChefHealthCareUnitDNs(String hsaIdentity) {
+        String orgFilter = format("(&(objectclass=organizationalUnit)(hsaHealthCareUnitManager=%s))",
+                hsaIdentity);
 
-        return ldapTemplate.search(orgBase, orgFilter, new AttributesMapper() {
-            @Override
-            public Object mapFromAttributes(Attributes attributes) throws NamingException {
-                return attributes.get("dn");
-            }
-        });
+        return resolveUnit(orgFilter);
     }
 
-    private class PersonalContextMapper implements ContextMapper {
-        @Override
-        public Object mapFromContext(Object context) {
-            DirContextAdapter ctx = (DirContextAdapter) context;
+    //    private HealthCareUnit lookupUnit(String orgDN) {
+//        return (HealthCareUnit) ldapTemplate.lookup(orgDN, new UnitContextMapper());
+//    }
 
-            Personal personal = new Personal();
-            personal.setDn(ctx.getDn().toString());
-            personal.setDisplayName(ctx.getStringAttribute("displayName"));
-            personal.setFullName(ctx.getStringAttribute("fullName"));
-            personal.setGivenName(ctx.getStringAttribute("givenName"));
-            personal.setHsaIdentity(ctx.getStringAttribute("hsaIdentity"));
-            personal.setMail(ctx.getStringAttribute("mail"));
-            personal.setSn(ctx.getStringAttribute("sn"));
-            personal.setTitle(ctx.getStringAttribute("title"));
-            personal.setUid(ctx.getStringAttribute("uid"));
-            personal.setVgrStructurePersonDN(ctx.getStringAttributes("vgrStructurePersonDN"));
-
-            return personal;
+    private List<HealthCareUnit> resolveUnit(String filter) {
+        try {
+            String base = "ou=Org,o=vgr";
+            return (List<HealthCareUnit>) ldapTemplate.search(base, filter, new HealthCareUnitContextMapper());
+        } catch (Exception ex) {
+            String msg = format("Failed to resolve Unit information for [%s]", filter);
+            throw new RuntimeException(msg, ex);
         }
     }
 
-    private static class UnitContextMapper implements ContextMapper {
-        @Override
-        public Object mapFromContext(Object context) {
-            DirContextAdapter ctx = (DirContextAdapter) context;
-
-            HealthCareUnit unit = new HealthCareUnit();
-            unit.setDn(ctx.getDn().toString());
-            unit.setOu(ctx.getStringAttribute("ou"));
-            unit.setHsaIdentity(ctx.getStringAttribute("hsaIdentity"));
-            unit.setHsaHealthCareUnitManager(ctx.getStringAttribute("hsaHealthCareUnitManager"));
-            unit.setHsaHealthCareUnitMembers(ctx.getStringAttributes("hsaHealthCareUnitMember"));
-            unit.setHsaResponsibleHealthCareProvider(ctx.getStringAttribute("hsaResponsibleHealthCareProvider"));
-            unit.setHsaInternalAddress(ctx.getStringAttribute("hsaInternalAddress"));
-            unit.setLabeledUri(ctx.getStringAttribute("labeledUri"));
-            unit.setVgrOrganizationalUnitNameShort(ctx.getStringAttribute("vgrOrganizationalUnitNameShort"));
-
-            return unit;
+    private List<PersonalInfo> resolvePersonal(String filter) {
+        try {
+            String base = "ou=personal,ou=anv,o=vgr";
+            return (List<PersonalInfo>) ldapTemplate.search(base, filter, new PersonalInfoContextMapper());
+        } catch (Exception ex) {
+            String msg = format("Failed to resolve Personal information for [%s]", filter);
+            throw new RuntimeException(msg, ex);
         }
     }
 }

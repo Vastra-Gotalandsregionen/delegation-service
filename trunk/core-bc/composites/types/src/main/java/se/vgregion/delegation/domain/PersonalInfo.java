@@ -6,7 +6,7 @@ package se.vgregion.delegation.domain;
  *
  * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
  */
-public class Personal {
+public class PersonalInfo {
     String dn;
     String uid;
     String givenName;
@@ -100,7 +100,7 @@ public class Personal {
 
     @Override
     public String toString() {
-        return "Personal{" +
+        return "PersonalInfo{" +
                 "dn='" + dn + '\'' +
                 ", uid='" + uid + '\'' +
                 ", displayName='" + displayName + '\'' +

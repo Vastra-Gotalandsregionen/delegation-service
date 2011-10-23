@@ -1,6 +1,6 @@
 package se.vgregion.delegation.persistence;
 
-import se.vgregion.delegation.domain.VerksamhetsChef;
+import se.vgregion.delegation.domain.VerksamhetsChefInfo;
 
 import java.util.List;
 
@@ -12,5 +12,5 @@ import java.util.List;
  */
 public interface VerksamhetsChefDao {
     boolean isVerksamhetsChef(String vgrId);
-    List<VerksamhetsChef> find(String vgrId);
+    List<VerksamhetsChefInfo> find(String vgrId);
 }
