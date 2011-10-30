@@ -17,6 +17,7 @@ import se.vgregion.delegation.domain.PersonalInfo;
 import se.vgregion.delegation.domain.VerksamhetsChefInfo;
 import se.vgregion.delegation.persistence.VerksamhetsChefDao;
 
+import javax.naming.Name;
 import java.util.Arrays;
 import java.util.List;
 
@@ -179,12 +180,25 @@ public class VerksamhetsChefDaoImplTest extends AbstractJUnit4SpringContextTests
         assertSame(ingaende, vc.getIngaendeEnheter());
     }
 
-//    @Test
-//    public void testContextMappers() {
-//        VerksamhetsChefDaoImpl.PersonalInfoContextMapper piMapper =
-//                new VerksamhetsChefDaoImpl.PersonalInfoContextMapper();
-//
-//        DirContextAdapter ctx = Mockito.mock(DirContextAdapter.class);
-//        assertNotNull(piMapper.mapFromContext(ctx));
-//    }
+    @Test
+    public void testPersonalInfoContextMapper() {
+        PersonalInfoContextMapper piMapper = new PersonalInfoContextMapper();
+
+        DirContextAdapter ctx = Mockito.mock(DirContextAdapter.class);
+        Name DN = Mockito.mock(Name.class);
+        when(ctx.getDn()).thenReturn(DN);
+
+        assertNotNull(piMapper.mapFromContext(ctx));
+    }
+
+    @Test
+    public void testHealthCareUnitContextMapper() {
+        HealthCareUnitContextMapper hcuMapper = new HealthCareUnitContextMapper();
+
+        DirContextAdapter ctx = Mockito.mock(DirContextAdapter.class);
+        Name DN = Mockito.mock(Name.class);
+        when(ctx.getDn()).thenReturn(DN);
+
+        assertNotNull(hcuMapper.mapFromContext(ctx));
+    }
 }

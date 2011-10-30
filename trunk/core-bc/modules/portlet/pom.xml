@@ -40,6 +40,12 @@ Generation time : 2011-10-07 13:31:17 CEST
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>oppna-program-delegation-service-core-bc-svc-camel</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>javax.portlet</groupId>
       <artifactId>portlet-api</artifactId>
     </dependency>

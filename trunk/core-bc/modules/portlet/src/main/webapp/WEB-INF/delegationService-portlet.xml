@@ -10,12 +10,12 @@
 
   <import resource="classpath*:jpa-delegation-service-configuration.xml"/>
   <import resource="classpath*:ldap-delegation-service-configuration.xml"/>
+  <import resource="classpath*:META-INF/spring/messagebus-sign-routes.xml"/>
 
   <context:annotation-config/>
   <context:component-scan base-package="se.vgregion.delegation.controller"/>
 
-  <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
-        p:location="classpath:datasource.properties,classpath:security.properties" />
+  <context:property-placeholder location="classpath:datasource.properties,classpath:security.properties" />
 
   <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
     <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
