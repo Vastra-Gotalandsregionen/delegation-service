@@ -10,7 +10,7 @@ import org.eclipse.jetty.util.resource.Resource;
  * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
  */
 public class SpringSslContextFactory extends SslContextFactory {
-    public void setTrustStoreResource(Resource resource) {
+    public void setTrustStoreResource(Resource resource) throws Exception {
         setTrustStore(resource);
     }
 }

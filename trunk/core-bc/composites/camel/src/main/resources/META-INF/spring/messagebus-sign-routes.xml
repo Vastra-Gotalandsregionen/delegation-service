@@ -12,15 +12,20 @@
   <context:annotation-config/>
   <context:spring-configured/>
 
+  <!-- SSL server configuration -->
+
   <camelContext xmlns="http://camel.apache.org/schema/spring">
-
     <routeBuilder ref="delegationSigningResultRouteBuilder"/>
-
   </camelContext>
 
   <!-- RouteBuilders -->
   <bean id="delegationSigningResultRouteBuilder" class="se.vgregion.routes.DelegationSigningResultRouteBuilder">
-    <constructor-arg value="${response.url}" />
+    <constructor-arg value="${sign.response.url}" />
+    <constructor-arg ref="delegationSigningHandler" />
   </bean>
+
+  <bean id="delegationSigningHandler" class="se.vgregion.handlers.DelegationSigningHandler" />
+
+  <bean id="delegationService" class="se.vgregion.delegation.DelegationServiceImpl" />
 
 </beans>

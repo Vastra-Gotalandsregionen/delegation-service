@@ -22,7 +22,6 @@
             <property name="password" value="${password}"/>
             <property name="keyPassword" value="${keyPassword}"/>
             <property name="needClientAuth" value="false"/>
-            <property name="truststore" value="${server.truststore}"/>
           </bean>
         </entry>
       </map>

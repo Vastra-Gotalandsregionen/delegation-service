@@ -3,6 +3,7 @@ package se.vgregion.delegation.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +30,15 @@ import static javax.portlet.PortletRequest.USER_INFO;
 public class ViewController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ViewController.class);
 
+    @Value("${sign.request.url}")
+    private String signRequestUrl;
+
+    @Value("${sign.response.url}")
+    private String signResponseUrl;
+
+    @Value("${sign.client.type}")
+    private String signClientType;
+
     @Autowired
     private DelegationService delegationService;
 
@@ -39,8 +49,9 @@ public class ViewController {
         Delegation activeDelegation = delegationService.activeDelegations(uid);
         Delegation pendingDelegation = delegationService.pendingDelegation(uid);
 
-        model.addAttribute("sign_clientType", "BankId");
-        model.addAttribute("sign_submitUri", "http://localhost:9090/saveSignature");
+        model.addAttribute("signRequestUrl", signRequestUrl);
+        model.addAttribute("sign_clientType", signClientType);
+        model.addAttribute("sign_submitUri", signResponseUrl);
 
         return "view";
     }
