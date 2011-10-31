@@ -1,6 +1,7 @@
 package se.vgregion.routes;
 
 import org.apache.camel.spring.SpringRouteBuilder;
+import se.vgregion.handlers.SigningHandler;
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,13 +11,17 @@ import org.apache.camel.spring.SpringRouteBuilder;
  */
 public class DelegationSigningResultRouteBuilder extends SpringRouteBuilder {
     private final String uri;
+    private final SigningHandler signingHandler;
 
-    public DelegationSigningResultRouteBuilder(String uri) {
+    public DelegationSigningResultRouteBuilder(String uri, SigningHandler signingHandler) {
         this.uri = uri;
+        this.signingHandler = signingHandler;
     }
 
     @Override
     public void configure() throws Exception {
-        //To change body of implemented methods use File | Settings | File Templates.
+        from("jetty:" + uri)
+                .errorHandler(deadLetterChannel("direct:error_" + uri))
+                .bean(signingHandler, "signApproval");
     }
 }
