@@ -28,9 +28,10 @@
     </property>
   </bean>
 
-  <bean id="sslContextFactory" class="se.vgregion.ssl.SpringSslContextFactory">
-    <property name="keyStoreResource" ref="keyStoreResource" />
-    <property name="trustStoreResource" ref="trustStoreResource"/>
+  <bean id="sslContextFactory" class="se.vgregion.ssl.SslContextFactoryAdapter"
+        factory-method="createSslContextFactory">
+    <constructor-arg index="0" ref="keyStoreResource" />
+    <constructor-arg index="1" ref="trustStoreResource"/>
   </bean>
 
   <bean id="keyStoreResource" class="org.eclipse.jetty.util.resource.Resource" factory-method="newSystemResource">

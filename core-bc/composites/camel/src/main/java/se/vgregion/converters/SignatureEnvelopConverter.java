@@ -17,6 +17,9 @@ import java.io.StringReader;
 @Converter
 public class SignatureEnvelopConverter {
 
+    private SignatureEnvelopConverter() {
+    }
+
     @Converter
     public static SignatureEnvelope toSignatureEnvelope(String xml) {
         try {

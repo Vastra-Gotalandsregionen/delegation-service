@@ -9,7 +9,7 @@ import se.vgregion.proxy.signera.signature.SignatureEnvelope;
  *
  * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
  */
-public interface SigningHandler {
+public interface SignatureHandler {
 
     /**
      * Handles the response from signing service.
@@ -18,5 +18,5 @@ public interface SigningHandler {
      * @param camelContext - handle to the camelContext.
      * @return result of local signing approval handling that can be processed further.
      */
-    Object signApproval(SignatureEnvelope signMessage, CamelContext camelContext);
+    SignatureEnvelope storeSignature(SignatureEnvelope signMessage, CamelContext camelContext);
 }

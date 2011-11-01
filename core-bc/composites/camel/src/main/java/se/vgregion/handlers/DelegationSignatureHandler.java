@@ -1,0 +1,42 @@
+package se.vgregion.handlers;
+
+import org.apache.camel.CamelContext;
+import org.springframework.transaction.annotation.Transactional;
+import se.vgregion.delegation.DelegationService;
+import se.vgregion.delegation.domain.Delegation;
+import se.vgregion.proxy.signera.signature.SignatureEnvelope;
+
+import javax.annotation.Resource;
+
+/**
+ * Created by IntelliJ IDEA.
+ * Created: 2011-10-31 12:55
+ *
+ * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
+ */
+public class DelegationSignatureHandler implements SignatureHandler {
+
+    @Resource
+    private DelegationService delegationService;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Transactional
+    public SignatureEnvelope storeSignature(SignatureEnvelope signatureEnvelope, CamelContext camelContext) {
+        // 0: check for errors
+        int errorCode = signatureEnvelope.getErrorCode();
+
+        if (errorCode == 0) {
+            // 1: resolve delegationId
+            Delegation delegation = delegationService.find(Long.parseLong(signatureEnvelope.getSignatureName()));
+
+            // 2: validate signature and delegation
+
+            // 3: store signToken on delegation and commit
+            delegationService.approve(delegation, signatureEnvelope.getSignature());
+        }
+
+        return signatureEnvelope;
+    }
+}
