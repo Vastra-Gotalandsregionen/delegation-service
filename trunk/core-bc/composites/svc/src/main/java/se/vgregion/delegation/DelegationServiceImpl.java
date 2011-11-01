@@ -102,6 +102,11 @@ public class DelegationServiceImpl implements DelegationService {
         return newDelegation;
     }
 
+    @Override
+    public Delegation find(Long delegationId) {
+        return delegationRepository.find(delegationId);
+    }
+
     /**
      * Validate that signToken is signed by signer.
      *

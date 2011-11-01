@@ -24,4 +24,15 @@ public class SignatureEnvelopConverterTest {
 
         assertEquals("Apa", signatureEnvelope.getSignature());
     }
+
+    @Test(expected = RuntimeException.class)
+    public void testToSignatureEnvelopeFail() throws Exception {
+        String xml = "<?xml version=\"1.0\"?>" +
+                "<signatureEnvelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://signera.proxy.vgregion.se/signature\" >" +
+                "<errorCod>0</errorCode>" +
+                "<signature>Apa</signature>" +
+                "</signatureEnvelope>";
+
+        SignatureEnvelope signatureEnvelope = SignatureEnvelopConverter.toSignatureEnvelope(xml);
+    }
 }

@@ -54,4 +54,6 @@ public interface DelegationService {
      * @return
      */
     Delegation extend(Long oldDelegationId, String createdBy, DateTime newFrom, DateTime newTo);
+
+    Delegation find(Long delegationId);
 }

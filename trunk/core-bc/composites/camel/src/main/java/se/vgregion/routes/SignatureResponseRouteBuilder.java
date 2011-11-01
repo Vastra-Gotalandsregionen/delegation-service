@@ -1,7 +1,7 @@
 package se.vgregion.routes;
 
 import org.apache.camel.spring.SpringRouteBuilder;
-import se.vgregion.handlers.SigningHandler;
+import se.vgregion.handlers.SignatureHandler;
 
 /**
  * Created by IntelliJ IDEA.
@@ -9,11 +9,11 @@ import se.vgregion.handlers.SigningHandler;
  *
  * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
  */
-public class DelegationSigningResultRouteBuilder extends SpringRouteBuilder {
+public class SignatureResponseRouteBuilder extends SpringRouteBuilder {
     private final String uri;
-    private final SigningHandler signingHandler;
+    private final SignatureHandler signingHandler;
 
-    public DelegationSigningResultRouteBuilder(String uri, SigningHandler signingHandler) {
+    public SignatureResponseRouteBuilder(String uri, SignatureHandler signingHandler) {
         this.uri = uri;
         this.signingHandler = signingHandler;
     }
@@ -22,6 +22,6 @@ public class DelegationSigningResultRouteBuilder extends SpringRouteBuilder {
     public void configure() throws Exception {
         from("jetty:" + uri)
                 .errorHandler(deadLetterChannel("direct:error_" + uri))
-                .bean(signingHandler, "signApproval");
+                .bean(signingHandler, "storeSignature");
     }
 }

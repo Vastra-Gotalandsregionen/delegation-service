@@ -7,8 +7,6 @@
                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
                            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-  <!--<import resource="messagebus-common.xml"/>-->
-
   <context:annotation-config/>
   <context:spring-configured/>
 
@@ -19,13 +17,11 @@
   </camelContext>
 
   <!-- RouteBuilders -->
-  <bean id="delegationSigningResultRouteBuilder" class="se.vgregion.routes.DelegationSigningResultRouteBuilder">
-    <constructor-arg value="${sign.response.url}" />
-    <constructor-arg ref="delegationSigningHandler" />
+  <bean id="delegationSigningResultRouteBuilder" class="se.vgregion.routes.SignatureResponseRouteBuilder">
+    <constructor-arg value="${sign.response.url}"/>
+    <constructor-arg ref="delegationSigningHandler"/>
   </bean>
 
-  <bean id="delegationSigningHandler" class="se.vgregion.handlers.DelegationSigningHandler" />
-
-  <bean id="delegationService" class="se.vgregion.delegation.DelegationServiceImpl" />
+  <bean id="delegationSigningHandler" class="se.vgregion.handlers.DelegationSignatureHandler"/>
 
 </beans>
