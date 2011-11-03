@@ -2,6 +2,7 @@ package se.vgregion.delegation;
 
 import org.joda.time.DateTime;
 import se.vgregion.delegation.domain.Delegation;
+import se.vgregion.delegation.domain.VerksamhetsChefInfo;
 
 import java.util.List;
 
@@ -56,4 +57,6 @@ public interface DelegationService {
     Delegation extend(Long oldDelegationId, String createdBy, DateTime newFrom, DateTime newTo);
 
     Delegation find(Long delegationId);
+
+    List<VerksamhetsChefInfo> lookupVerksamhetsChefInfo(String vcVgrId);
 }

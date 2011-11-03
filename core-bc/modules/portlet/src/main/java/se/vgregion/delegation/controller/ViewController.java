@@ -1,5 +1,7 @@
 package se.vgregion.delegation.controller;
 
+import com.liferay.portal.util.PortalUtil;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +12,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import se.vgregion.delegation.DelegationService;
 import se.vgregion.delegation.domain.Delegation;
+import se.vgregion.delegation.domain.VerksamhetsChefInfo;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static javax.portlet.PortletRequest.P3PUserInfos.USER_LOGIN_ID;
 import static javax.portlet.PortletRequest.USER_INFO;
@@ -33,8 +40,14 @@ public class ViewController {
     @Value("${sign.request.url}")
     private String signRequestUrl;
 
-    @Value("${sign.response.url}")
-    private String signResponseUrl;
+    @Value("${sign.response.protocol}")
+    private String signResponseProtocol;
+    @Value("${sign.response.name}")
+    private String signResponseName;
+    @Value("${sign.response.port}")
+    private String signResponsePort;
+    @Value("${sign.response.path}")
+    private String signResponsePath;
 
     @Value("${sign.client.type}")
     private String signClientType;
@@ -44,16 +57,35 @@ public class ViewController {
 
     @RenderMapping
     public String showView(RenderRequest request, Model model) {
-        String uid = lookupUid(request);
+        try {
+            String uid = lookupUid(request);
 
-        Delegation activeDelegation = delegationService.activeDelegations(uid);
-        Delegation pendingDelegation = delegationService.pendingDelegation(uid);
+            Delegation activeDelegation = delegationService.activeDelegations(uid);
+            Delegation pendingDelegation = delegationService.pendingDelegation(uid);
 
-        model.addAttribute("signRequestUrl", signRequestUrl);
-        model.addAttribute("sign_clientType", signClientType);
-        model.addAttribute("sign_submitUri", signResponseUrl);
+            List<VerksamhetsChefInfo> vcInfo = delegationService.lookupVerksamhetsChefInfo(uid);
 
-        return "view";
+            String signResponseUrl = responseUrlBuilder(request, pendingDelegation);
+
+            model.addAttribute("sign_requestUrl", signRequestUrl);
+            model.addAttribute("sign_clientType", signClientType);
+            model.addAttribute("sign_submitUri", signResponseUrl);
+
+            return "view";
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "view";
+        }
+    }
+
+    private String responseUrlBuilder(PortletRequest request, Delegation pendingDelegation) throws UnknownHostException {
+        String server = (StringUtils.isBlank(signResponseName) ?
+                InetAddress.getLocalHost().getHostName() : signResponseName);
+        String path = signResponsePath.startsWith("/") ? signResponsePath.substring(1) : signResponsePath;
+        String correlationId = UUID.randomUUID().toString();
+
+        return String.format("%s://%s:%s/%s?correlationId=%s&delegationId=%s", signResponseProtocol, server,
+                signResponsePort, path, correlationId, pendingDelegation.getId());
     }
 
     private String lookupUid(PortletRequest req) {

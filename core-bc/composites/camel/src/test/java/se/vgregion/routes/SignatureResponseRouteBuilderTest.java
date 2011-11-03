@@ -4,6 +4,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.component.http.HttpOperationFailedException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,9 +28,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -55,15 +54,15 @@ public class SignatureResponseRouteBuilderTest {
         final String body = "<?xml version=\"1.0\"?>" +
                 "<signatureEnvelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://signera.proxy.vgregion.se/signature\" >" +
                 "<errorCode>0</errorCode>" +
-                "<signatureName>123</signatureName>" +
+                "<signatureName>A-123</signatureName>" +
                 "<signature>Apa</signature>" +
                 "</signatureEnvelope>";
 
         Delegation delegation = mock(Delegation.class);
 
-        when(mockDelegationService.find(eq(123L))).thenReturn(delegation);
+        when(mockDelegationService.find(eq(456L))).thenReturn(delegation);
 
-        Exchange result = template.send(serverEndPoint, new Processor() {
+        Exchange result = template.send(serverEndPoint+"?correlationId=123&delegationId=456", new Processor() {
             @Override
             public void process(Exchange exchange) throws Exception {
                 exchange.getIn().setBody(body);
@@ -72,11 +71,48 @@ public class SignatureResponseRouteBuilderTest {
 
             }
         });
-        Object resultBody = result.getOut().getBody(SignatureEnvelope.class);
 
-        assertTrue(resultBody instanceof SignatureEnvelope);
-        assertEquals("Apa", ((SignatureEnvelope)resultBody).getSignature());
+        HttpOperationFailedException resultException = result.getException(HttpOperationFailedException.class);
+
+        assertEquals(302, resultException.getStatusCode());
+
+        assertTrue(resultException.getRedirectLocation().startsWith("http://"));
+        assertTrue(resultException.getRedirectLocation().endsWith(":8080/group/vgregion/start"));
 
         verify(mockDelegationService).approve(delegation, "Apa");
+    }
+
+    @Test
+    @DirtiesContext
+    public void testIncomingStoreFail() {
+        final String body = "<?xml version=\"1.0\"?>" +
+                "<signatureEnvelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://signera.proxy.vgregion.se/signature\" >" +
+                "<errorCode>0</errorCode>" +
+                "<signatureName>A-123</signatureName>" +
+                "<signature>Apa</signature>" +
+                "</signatureEnvelope>";
+
+        Delegation delegation = mock(Delegation.class);
+
+        when(mockDelegationService.find(eq(456L))).thenThrow(new RuntimeException());
+
+        Exchange result = template.send(serverEndPoint+"?correlationId=123&delegationId=456", new Processor() {
+            @Override
+            public void process(Exchange exchange) throws Exception {
+                exchange.getIn().setBody(body);
+                exchange.getIn().setHeader("CamelHttpMethod", "POST");
+                System.out.println("Test start");
+
+            }
+        });
+
+        HttpOperationFailedException resultException = result.getException(HttpOperationFailedException.class);
+
+        assertEquals(302, resultException.getStatusCode());
+
+        assertTrue(resultException.getRedirectLocation().startsWith("http://"));
+        assertTrue(resultException.getRedirectLocation().endsWith(":8080/"));
+
+        verify(mockDelegationService, never()).approve(delegation, "Apa");
     }
 }

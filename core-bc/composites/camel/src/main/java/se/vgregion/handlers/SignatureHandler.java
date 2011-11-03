@@ -1,6 +1,7 @@
 package se.vgregion.handlers;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
 import se.vgregion.proxy.signera.signature.SignatureEnvelope;
 
 /**
@@ -15,8 +16,7 @@ public interface SignatureHandler {
      * Handles the response from signing service.
      *
      * @param signMessage - the signMessage returned from signing service after it is done signing.
-     * @param camelContext - handle to the camelContext.
      * @return result of local signing approval handling that can be processed further.
      */
-    SignatureEnvelope storeSignature(SignatureEnvelope signMessage, CamelContext camelContext);
+    SignatureEnvelope storeSignature(SignatureEnvelope signMessage, Exchange exchange);
 }

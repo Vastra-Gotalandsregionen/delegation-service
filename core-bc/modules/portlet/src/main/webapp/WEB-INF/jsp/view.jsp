@@ -17,7 +17,8 @@
 <div>
     <h1>Hej Delegering</h1>
 
-    <form method="post" action="${signRequestUrl}">
+    <form method="post" action="${sign_requestUrl}">
+        <p>${sign_requestUrl}</p>
         <input name="tbs" value="Sätt in 1000 kronor på konto 123456-7" type="text"/>
         <input name="submitUri" value="${sign_submitUri}" type="text"/>
         <input name="clientType" value="${sign_clientType}" type="text"/>
