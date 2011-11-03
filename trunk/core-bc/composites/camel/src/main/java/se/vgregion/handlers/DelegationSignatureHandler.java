@@ -1,6 +1,7 @@
 package se.vgregion.handlers;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
 import org.springframework.transaction.annotation.Transactional;
 import se.vgregion.delegation.DelegationService;
 import se.vgregion.delegation.domain.Delegation;
@@ -23,13 +24,15 @@ public class DelegationSignatureHandler implements SignatureHandler {
      * {@inheritDoc}
      */
     @Transactional
-    public SignatureEnvelope storeSignature(SignatureEnvelope signatureEnvelope, CamelContext camelContext) {
+    public SignatureEnvelope storeSignature(SignatureEnvelope signatureEnvelope, Exchange exchange) {
         // 0: check for errors
         int errorCode = signatureEnvelope.getErrorCode();
 
         if (errorCode == 0) {
             // 1: resolve delegationId
-            Delegation delegation = delegationService.find(Long.parseLong(signatureEnvelope.getSignatureName()));
+            String correlationId = exchange.getIn().getHeader("correlationId", String.class);
+            Long delegationId = exchange.getIn().getHeader("delegationId", Long.class);
+            Delegation delegation = delegationService.find(delegationId);
 
             // 2: validate signature and delegation
 

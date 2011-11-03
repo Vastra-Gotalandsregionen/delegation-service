@@ -17,8 +17,8 @@
   </camelContext>
 
   <!-- RouteBuilders -->
-  <bean id="signingTest" class="se.vgregion.routes.SignatureResponseRouteBuilder">
-    <constructor-arg value="${server.endpoint}"/>
+  <bean id="signingTest" class="se.vgregion.routes.SignatureResponseRouteBuilder" init-method="init">
+    <!--<constructor-arg value="${server.endpoint}"/>-->
     <constructor-arg ref="delegationSignatureHandler"/>
   </bean>
 

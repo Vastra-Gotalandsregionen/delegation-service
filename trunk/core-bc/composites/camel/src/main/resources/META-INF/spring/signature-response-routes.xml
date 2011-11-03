@@ -17,8 +17,8 @@
   </camelContext>
 
   <!-- RouteBuilders -->
-  <bean id="delegationSigningResultRouteBuilder" class="se.vgregion.routes.SignatureResponseRouteBuilder">
-    <constructor-arg value="${sign.response.url}"/>
+  <bean id="delegationSigningResultRouteBuilder" class="se.vgregion.routes.SignatureResponseRouteBuilder"
+        init-method="init">
     <constructor-arg ref="delegationSigningHandler"/>
   </bean>
 
