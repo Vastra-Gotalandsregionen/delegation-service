@@ -55,10 +55,29 @@ public class VerksamhetsChefInfo {
         }
         memberUnitsBuffer.append("]");
 
-        return "VerksamhetsChefInfo-{" + verksamhetsChef.toString()+
-                ", vardEnhet=" + vardEnhet.dn +
+        String vardGivarStr = "";
+        if (vardEnhet != null) {
+            if (vardEnhet.dn != null) {
+                vardGivarStr = vardEnhet.dn;
+            } else {
+                vardGivarStr = vardEnhet.hsaIdentity;
+            }
+        }
+
+        String vardEnhetStr = "";
+        if (vardEnhet != null) {
+            vardEnhetStr = vardEnhet.dn;
+        }
+
+        String verksamhetsChefStr = "";
+        if (verksamhetsChef != null) {
+            verksamhetsChefStr = verksamhetsChef.toString();
+        }
+
+        return "VerksamhetsChefInfo-{" + verksamhetsChefStr +
+                ", vardEnhet=" + vardEnhetStr +
                 ", ingaendeEnheter=" + memberUnitsBuffer +
-                ", vardGivare=" + vardGivare.dn +
+                ", vardGivare=" + vardGivarStr +
                 '}';
     }
 }

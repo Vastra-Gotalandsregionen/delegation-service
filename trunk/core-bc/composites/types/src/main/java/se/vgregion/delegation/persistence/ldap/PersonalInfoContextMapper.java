@@ -19,7 +19,7 @@ public class PersonalInfoContextMapper implements ContextMapper {
             personal.setSn(ctx.getStringAttribute("sn"));
             personal.setTitle(ctx.getStringAttribute("title"));
             personal.setUid(ctx.getStringAttribute("uid"));
-            personal.setVgrStructurePersonDN(ctx.getStringAttributes("vgrStructurePersonDN"));
+            personal.setVgrStrukturPersonDN(ctx.getStringAttributes("vgrStrukturPersonDN"));
 
             return personal;
         }

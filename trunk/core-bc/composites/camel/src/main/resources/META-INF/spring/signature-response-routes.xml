@@ -11,6 +11,34 @@
   <context:spring-configured/>
 
   <!-- SSL server configuration -->
+  <bean id="jetty" class="org.apache.camel.component.jetty.JettyHttpComponent">
+    <property name="sslSocketConnectors">
+      <map>
+        <entry key="${sign.response.port}">
+          <bean class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
+            <constructor-arg ref="sslContextFactory" />
+            <property name="password" value="${keyPassword}"/>
+            <property name="keyPassword" value="${keyPassword}"/>
+            <property name="needClientAuth" value="true"/>
+          </bean>
+        </entry>
+      </map>
+    </property>
+  </bean>
+
+  <bean id="sslContextFactory" class="se.vgregion.ssl.SslContextFactoryAdapter"
+        factory-method="createSslContextFactory">
+    <constructor-arg index="0" ref="keyStoreResource" />
+    <constructor-arg index="1" ref="trustStoreResource"/>
+  </bean>
+
+  <bean id="keyStoreResource" class="org.eclipse.jetty.util.resource.Resource" factory-method="newSystemResource">
+    <constructor-arg value="${server.keystore}"/>
+  </bean>
+
+  <bean id="trustStoreResource" class="org.eclipse.jetty.util.resource.Resource" factory-method="newSystemResource">
+    <constructor-arg value="${server.truststore}"/>
+  </bean>
 
   <camelContext xmlns="http://camel.apache.org/schema/spring">
     <routeBuilder ref="delegationSigningResultRouteBuilder"/>
