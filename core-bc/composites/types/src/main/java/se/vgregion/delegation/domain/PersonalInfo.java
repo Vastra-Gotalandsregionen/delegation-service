@@ -16,7 +16,7 @@ public class PersonalInfo {
     String title;
     String mail;
     String hsaIdentity;
-    String[] vgrStructurePersonDN;
+    String[] vgrStrukturPersonDN;
 
     public String getDisplayName() {
         return displayName;
@@ -90,12 +90,12 @@ public class PersonalInfo {
         this.uid = uid;
     }
 
-    public String[] getVgrStructurePersonDN() {
-        return vgrStructurePersonDN;
+    public String[] getVgrStrukturPersonDN() {
+        return vgrStrukturPersonDN;
     }
 
-    public void setVgrStructurePersonDN(String[] vgrStructurePersonDN) {
-        this.vgrStructurePersonDN = vgrStructurePersonDN;
+    public void setVgrStrukturPersonDN(String[] vgrStrukturPersonDN) {
+        this.vgrStrukturPersonDN = vgrStrukturPersonDN;
     }
 
     @Override
@@ -110,7 +110,7 @@ public class PersonalInfo {
                 ", title='" + title + '\'' +
                 ", mail='" + mail + '\'' +
                 ", hsaIdentity='" + hsaIdentity + '\'' +
-                ", vgrStructurePersonDN='" + vgrStructurePersonDN + '\'' +
+                ", vgrStrukturPersonDN='" + vgrStrukturPersonDN + '\'' +
                 '}';
     }
 }

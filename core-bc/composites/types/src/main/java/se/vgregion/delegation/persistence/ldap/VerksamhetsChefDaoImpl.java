@@ -64,32 +64,38 @@ public class VerksamhetsChefDaoImpl implements VerksamhetsChefDao {
                 vc.setVardEnhet(vardEnhet);
 
                 // 2b: resolve Personal for VårdEnhet
-                String vardEnhetPersonalFilter = format("(&(objectclass=person)(vgrStrukturPersonDN=%s))",
-                        vardEnhet.getDn());
+                String vardEnhetPersonalFilter = format("(&(objectClass=person)%s)",
+                        personalInUnit(vardEnhet.getDn()));
                 vardEnhet.setPersonal(resolvePersonal(vardEnhetPersonalFilter));
 
 
                 // 3: resolve VårdGivare
-                String vardGivarFilter = format("(&(objectclass=organizationalUnit)(hsaIdentity=%s))",
-                        vardEnhet.getHsaResponsibleHealthCareProvider());
-                List<HealthCareUnit> vardGivarResult = resolveUnit(vardGivarFilter);
-                switch (vardGivarResult.size()) {
-                    case 0: {
-                        String msg = format("Failed to resolve VårdGivare [%s] för VårdEnhet [%s]. " +
-                                "Catalog data-error - VårdGivare cannot be found.",
-                                vardEnhet.getHsaResponsibleHealthCareProvider(),
-                                vardEnhet.getHsaIdentity());
-                        throw new RuntimeException(msg);
-                    }
-                    case 1:
-                        vc.setVardGivare(vardGivarResult.get(0));
-                        break;
-                    default: {
-                        String msg = format("Failed to resolve VårdGivare [%s] för VårdEnhet [%s]. " +
-                                "Catalog data-error - VårdGivare is ambiguous.",
-                                vardEnhet.getHsaResponsibleHealthCareProvider(),
-                                vardEnhet.getHsaIdentity());
-                        throw new RuntimeException(msg);
+                if ("SE2321000131-E000000000001".equals(vardEnhet.getHsaResponsibleHealthCareProvider())) {
+                    HealthCareUnit vardGivare = new HealthCareUnit();
+                    vardGivare.setHsaIdentity(vardEnhet.getHsaResponsibleHealthCareProvider());
+                    vc.setVardGivare(vardGivare);
+                } else {
+                    String vardGivarFilter = format("(&(objectClass=organizationalUnit)(hsaIdentity=%s))",
+                            vardEnhet.getHsaResponsibleHealthCareProvider());
+                    List<HealthCareUnit> vardGivarResult = resolveUnit(vardGivarFilter);
+                    switch (vardGivarResult.size()) {
+                        case 0: {
+                            String msg = format("Failed to resolve VårdGivare [%s] för VårdEnhet [%s]. " +
+                                    "Catalog data-error - VårdGivare cannot be found.",
+                                    vardEnhet.getHsaResponsibleHealthCareProvider(),
+                                    vardEnhet.getHsaIdentity());
+                            throw new RuntimeException(msg);
+                        }
+                        case 1:
+                            vc.setVardGivare(vardGivarResult.get(0));
+                            break;
+                        default: {
+                            String msg = format("Failed to resolve VårdGivare [%s] för VårdEnhet [%s]. " +
+                                    "Catalog data-error - VårdGivare is ambiguous.",
+                                    vardEnhet.getHsaResponsibleHealthCareProvider(),
+                                    vardEnhet.getHsaIdentity());
+                            throw new RuntimeException(msg);
+                        }
                     }
                 }
 
@@ -100,13 +106,14 @@ public class VerksamhetsChefDaoImpl implements VerksamhetsChefDao {
                         orClause.append("(hsaIdentity=").append(hsaIdentityUnit).append(")");
                     }
                     orClause.append(")");
-                    String ingaendeEnhetFilter = format("(&(objectclass=organizationalUnit)%s)", orClause);
+                    String ingaendeEnhetFilter = format("(&(objectClass=organizationalUnit)%s)", orClause);
                     vc.setIngaendeEnheter(resolveUnit(ingaendeEnhetFilter));
 
                     // 4b: foreach Enhet add Personal
                     for (HealthCareUnit enhet : vc.getIngaendeEnheter()) {
-                        String enhetPersonalFilter = format("(&(objectclass=person)(vgrStrukturPersonDN=%s))",
-                                enhet.getDn());
+                        String enhetPersonalFilter = format("(&(objectClass=person)%s)",
+                                personalInUnit(enhet.getDn()));
+
                         enhet.setPersonal(resolvePersonal(enhetPersonalFilter));
                     }
                 }
@@ -121,8 +128,20 @@ public class VerksamhetsChefDaoImpl implements VerksamhetsChefDao {
         }
     }
 
+    private String personalInUnit(String unitDn) {
+        String[] strukturGroup = unitDn.split(",");
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("(ou=").append(strukturGroup[0].split("=")[1]).append(")");
+        for (int i=1; i < strukturGroup.length; i++) {
+            sb.append("(StrukturGrupp=").append(strukturGroup[i].split("=")[1]).append(")");
+        }
+
+        return sb.toString();
+    }
+
     private PersonalInfo lookup(String vgrId) {
-        String userFilter = format("(&(objectclass=person)(uid=%s))", vgrId);
+        String userFilter = format("(&(objectClass=person)(uid=%s))", vgrId);
 
         List<PersonalInfo> hsaIdentities = resolvePersonal(userFilter);
 
@@ -139,7 +158,7 @@ public class VerksamhetsChefDaoImpl implements VerksamhetsChefDao {
     }
 
     private List<HealthCareUnit> lookupVerksamhetsChefHealthCareUnitDNs(String hsaIdentity) {
-        String orgFilter = format("(&(objectclass=organizationalUnit)(hsaHealthCareUnitManager=%s))",
+        String orgFilter = format("(&(objectClass=organizationalUnit)(hsaHealthCareUnitManager=%s))",
                 hsaIdentity);
 
         return resolveUnit(orgFilter);
@@ -151,7 +170,7 @@ public class VerksamhetsChefDaoImpl implements VerksamhetsChefDao {
 
     private List<HealthCareUnit> resolveUnit(String filter) {
         try {
-            String base = "ou=Org,o=vgr";
+            String base = "ou=Org";
             return (List<HealthCareUnit>) ldapTemplate.search(base, filter, new HealthCareUnitContextMapper());
         } catch (Exception ex) {
             String msg = format("Failed to resolve Unit information for [%s]", filter);
@@ -161,7 +180,7 @@ public class VerksamhetsChefDaoImpl implements VerksamhetsChefDao {
 
     private List<PersonalInfo> resolvePersonal(String filter) {
         try {
-            String base = "ou=personal,ou=anv,o=vgr";
+            String base = "ou=personal,ou=anv";
             return (List<PersonalInfo>) ldapTemplate.search(base, filter, new PersonalInfoContextMapper());
         } catch (Exception ex) {
             String msg = format("Failed to resolve Personal information for [%s]", filter);
