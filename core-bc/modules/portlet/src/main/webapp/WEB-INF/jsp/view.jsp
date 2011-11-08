@@ -14,8 +14,28 @@
     <%@ include file="/css/delegation.css" %>
 </style>
 
+<portlet:actionURL var="selectVardEnhet" name="selectVardEnhet" portletMode="VIEW"/>
+
 <div>
     <h1>Hej Delegering</h1>
+
+    <form:form method="post" action="${selectVardEnhet}" commandName="delegationInfo">
+        <h2>Mina VårdEnheter</h2>
+        <form:select path="vardEnhet">
+            <form:option value="">-- Ingen VårdEnhet vald --</form:option>
+            <form:options items="${verksamhetsChefInfoList}" itemLabel="vardEnhet.ou" />
+        </form:select>
+        <h2>Alla VårdEnheter</h2>
+        <form:select path="vardEnhet">
+            <form:option value="">-- Ingen VårdEnhet vald --</form:option>
+            <form:options items="${allVardEnhets}" itemLabel="ou" />
+        </form:select>
+    </form:form>
+
+    <br/>
+    <br/>
+    <br/>
+    <br/>
 
     <form method="post" action="${sign_requestUrl}">
         <p>${sign_requestUrl}</p>

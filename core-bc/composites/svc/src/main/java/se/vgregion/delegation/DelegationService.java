@@ -2,9 +2,11 @@ package se.vgregion.delegation;
 
 import org.joda.time.DateTime;
 import se.vgregion.delegation.domain.Delegation;
+import se.vgregion.delegation.domain.HealthCareUnit;
 import se.vgregion.delegation.domain.VerksamhetsChefInfo;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -59,4 +61,6 @@ public interface DelegationService {
     Delegation find(Long delegationId);
 
     List<VerksamhetsChefInfo> lookupVerksamhetsChefInfo(String vcVgrId);
+
+    Set<HealthCareUnit> findAllVardEnhet();
 }

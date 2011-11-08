@@ -6,9 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import se.vgregion.delegation.domain.Delegation;
+import se.vgregion.delegation.domain.HealthCareUnit;
 import se.vgregion.delegation.domain.VerksamhetsChefInfo;
 import se.vgregion.delegation.persistence.DelegationRepository;
 import se.vgregion.delegation.persistence.DelegationToRepository;
+import se.vgregion.delegation.persistence.HealthCareUnitDao;
 import se.vgregion.delegation.persistence.VerksamhetsChefDao;
 
 import javax.persistence.NoResultException;
@@ -16,6 +18,7 @@ import javax.persistence.NonUniqueResultException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
@@ -31,6 +34,9 @@ public class DelegationServiceImpl implements DelegationService {
 
     @Autowired
     private VerksamhetsChefDao verksamhetsChefDao;
+
+    @Autowired
+    private HealthCareUnitDao healthCareUnitDao;
 
     @Override
     public Delegation activeDelegations(String vcVgrId) {
@@ -115,6 +121,11 @@ public class DelegationServiceImpl implements DelegationService {
     @Override
     public List<VerksamhetsChefInfo> lookupVerksamhetsChefInfo(String vcVgrId) {
         return verksamhetsChefDao.find(vcVgrId);
+    }
+
+    @Override
+    public Set<HealthCareUnit> findAllVardEnhet() {
+        return healthCareUnitDao.findAll();
     }
 
     /**

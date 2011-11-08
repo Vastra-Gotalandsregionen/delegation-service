@@ -31,4 +31,6 @@
 
   <bean id="verksamhetsChefDao" class="se.vgregion.delegation.persistence.ldap.VerksamhetsChefDaoImpl" />
 
+  <bean id="healthCareUnitDao" class="se.vgregion.delegation.persistence.ldap.HealthCareUnitDaoImpl" />
+
 </beans>
