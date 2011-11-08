@@ -2,7 +2,7 @@ package se.vgregion.delegation.model;
 
 import se.vgregion.delegation.domain.Delegation;
 import se.vgregion.delegation.domain.HealthCareUnit;
-import se.vgregion.delegation.domain.VerksamhetsChefInfo;
+import se.vgregion.delegation.domain.VardEnhetInfo;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import java.util.List;
 public class DelegationInfo {
 
     private HealthCareUnit vardEnhet;
-    private VerksamhetsChefInfo verksamhetsChefInfo;
+    private VardEnhetInfo vardEnhetInfo;
     private Delegation delegation;
     private Delegation activeDelegation;
     private List<Delegation> delegationHistory;
@@ -52,11 +52,11 @@ public class DelegationInfo {
         this.vardEnhet = vardEnhet;
     }
 
-    public VerksamhetsChefInfo getVerksamhetsChefInfo() {
-        return verksamhetsChefInfo;
+    public VardEnhetInfo getVardEnhetInfo() {
+        return vardEnhetInfo;
     }
 
-    public void setVerksamhetsChefInfo(VerksamhetsChefInfo verksamhetsChefInfo) {
-        this.verksamhetsChefInfo = verksamhetsChefInfo;
+    public void setVardEnhetInfo(VardEnhetInfo vardEnhetInfo) {
+        this.vardEnhetInfo = vardEnhetInfo;
     }
 }

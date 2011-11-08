@@ -29,7 +29,7 @@
   <bean id="delegationRepository" class="se.vgregion.delegation.persistence.jpa.JpaDelegationRepository" />
   <bean id="delegationToRepository" class="se.vgregion.delegation.persistence.jpa.JpaDelegationToRepository" />
 
-  <bean id="verksamhetsChefDao" class="se.vgregion.delegation.persistence.ldap.VerksamhetsChefDaoImpl" />
+  <bean id="verksamhetsChefDao" class="se.vgregion.delegation.persistence.ldap.VardEnhetDaoImpl" />
 
   <bean id="healthCareUnitDao" class="se.vgregion.delegation.persistence.ldap.HealthCareUnitDaoImpl" />
 

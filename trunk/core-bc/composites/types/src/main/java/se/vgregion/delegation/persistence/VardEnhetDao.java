@@ -1,6 +1,6 @@
 package se.vgregion.delegation.persistence;
 
-import se.vgregion.delegation.domain.VerksamhetsChefInfo;
+import se.vgregion.delegation.domain.VardEnhetInfo;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
  */
-public interface VerksamhetsChefDao {
+public interface VardEnhetDao {
     boolean isVerksamhetsChef(String vgrId);
-    List<VerksamhetsChefInfo> find(String vgrId);
+    List<VardEnhetInfo> find(String vgrId);
 }

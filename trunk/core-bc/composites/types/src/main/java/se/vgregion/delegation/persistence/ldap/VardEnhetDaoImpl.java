@@ -6,10 +6,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import se.vgregion.delegation.domain.HealthCareUnit;
 import se.vgregion.delegation.domain.PersonalInfo;
-import se.vgregion.delegation.domain.VerksamhetsChefInfo;
+import se.vgregion.delegation.domain.VardEnhetInfo;
 import se.vgregion.delegation.persistence.HealthCareUnitDao;
 import se.vgregion.delegation.persistence.PersonalInfoDao;
-import se.vgregion.delegation.persistence.VerksamhetsChefDao;
+import se.vgregion.delegation.persistence.VardEnhetDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +22,8 @@ import static java.lang.String.format;
  *
  * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
  */
-public class VerksamhetsChefDaoImpl implements VerksamhetsChefDao {
-    private static final Logger LOGGER = LoggerFactory.getLogger(VerksamhetsChefDaoImpl.class);
+public class VardEnhetDaoImpl implements VardEnhetDao {
+    private static final Logger LOGGER = LoggerFactory.getLogger(VardEnhetDaoImpl.class);
 
     @Autowired
     private PersonalInfoDao personalInfoDao;
@@ -47,8 +47,8 @@ public class VerksamhetsChefDaoImpl implements VerksamhetsChefDao {
     }
 
     @Override
-    public List<VerksamhetsChefInfo> find(String vcVgrId) {
-        List<VerksamhetsChefInfo> verksamhetsChefList = new ArrayList<VerksamhetsChefInfo>();
+    public List<VardEnhetInfo> find(String vcVgrId) {
+        List<VardEnhetInfo> vardEnhetList = new ArrayList<VardEnhetInfo>();
         try {
             PersonalInfo vcInfo = personalInfoDao.lookup(vcVgrId);
             if (StringUtils.isBlank(vcInfo.getHsaIdentity())) {
@@ -59,13 +59,13 @@ public class VerksamhetsChefDaoImpl implements VerksamhetsChefDao {
 
             List<HealthCareUnit> vardEnhets = findVerksamhetsChefHealthCareUnit(vcInfo.getHsaIdentity());
             for (HealthCareUnit vardEnhet : vardEnhets) {
-                VerksamhetsChefInfo vc = new VerksamhetsChefInfo();
+                VardEnhetInfo vardEnhetInfo = new VardEnhetInfo();
 
                 // 1: resolve Personal information
-                vc.setVerksamhetsChef(vcInfo);
+                vardEnhetInfo.setVerksamhetsChef(vcInfo);
 
                 // 2: resolve VårdEnhet information
-                vc.setVardEnhet(vardEnhet);
+                vardEnhetInfo.setVardEnhet(vardEnhet);
 
                 // 2b: resolve Personal for VårdEnhet
                 String vardEnhetPersonalFilter = format("(&(objectClass=person)%s)",
@@ -77,7 +77,7 @@ public class VerksamhetsChefDaoImpl implements VerksamhetsChefDao {
                 if ("SE2321000131-E000000000001".equals(vardEnhet.getHsaResponsibleHealthCareProvider())) {
                     HealthCareUnit vardGivare = new HealthCareUnit();
                     vardGivare.setHsaIdentity(vardEnhet.getHsaResponsibleHealthCareProvider());
-                    vc.setVardGivare(vardGivare);
+                    vardEnhetInfo.setVardGivare(vardGivare);
                 } else {
                     String vardGivarFilter = format("(&(objectClass=organizationalUnit)(hsaIdentity=%s))",
                             vardEnhet.getHsaResponsibleHealthCareProvider());
@@ -91,7 +91,7 @@ public class VerksamhetsChefDaoImpl implements VerksamhetsChefDao {
                             throw new RuntimeException(msg);
                         }
                         case 1:
-                            vc.setVardGivare(vardGivarResult.get(0));
+                            vardEnhetInfo.setVardGivare(vardGivarResult.get(0));
                             break;
                         default: {
                             String msg = format("Failed to resolve VårdGivare [%s] för VårdEnhet [%s]. " +
@@ -105,16 +105,11 @@ public class VerksamhetsChefDaoImpl implements VerksamhetsChefDao {
 
                 // 4: resolve IngåendeEnheter
                 if (vardEnhet.getHsaHealthCareUnitMembers().length > 0) {
-                    StringBuilder orClause = new StringBuilder("(| ");
-                    for (String hsaIdentityUnit : vardEnhet.getHsaHealthCareUnitMembers()) {
-                        orClause.append("(hsaIdentity=").append(hsaIdentityUnit).append(")");
-                    }
-                    orClause.append(")");
-                    String ingaendeEnhetFilter = format("(&(objectClass=organizationalUnit)%s)", orClause);
-                    vc.setIngaendeEnheter(healthCareUnitDao.resolveUnit(ingaendeEnhetFilter));
+                    String ingaendeEnhetFilter = ingaendeEnheterFilter(vardEnhet);
+                    vardEnhetInfo.setIngaendeEnheter(healthCareUnitDao.resolveUnit(ingaendeEnhetFilter));
 
                     // 4b: foreach Enhet add Personal
-                    for (HealthCareUnit enhet : vc.getIngaendeEnheter()) {
+                    for (HealthCareUnit enhet : vardEnhetInfo.getIngaendeEnheter()) {
                         String enhetPersonalFilter = format("(&(objectClass=person)%s)",
                                 personalInfoDao.personalInUnitFilter(enhet.getDn()));
 
@@ -122,14 +117,26 @@ public class VerksamhetsChefDaoImpl implements VerksamhetsChefDao {
                     }
                 }
 
-                // 5: OK, add to list
-                verksamhetsChefList.add(vc);
+                // 5: Uppdrag
+                // TODO: Resolve HsaCommission
+
+                // 6: OK, add to list
+                vardEnhetList.add(vardEnhetInfo);
             }
-            return verksamhetsChefList;
+            return vardEnhetList;
         } catch (Exception ex) {
             LOGGER.error("Failed to extract VerksamhetsChef", ex);
-            return new ArrayList<VerksamhetsChefInfo>(); // Empty List due to data-error.
+            return new ArrayList<VardEnhetInfo>(); // Empty List due to data-error.
         }
+    }
+
+    private String ingaendeEnheterFilter(HealthCareUnit vardEnhet) {
+        StringBuilder orClause = new StringBuilder("(| ");
+        for (String hsaIdentityUnit : vardEnhet.getHsaHealthCareUnitMembers()) {
+            orClause.append("(hsaIdentity=").append(hsaIdentityUnit).append(")");
+        }
+        orClause.append(")");
+        return format("(&(objectClass=organizationalUnit)%s)", orClause);
     }
 
     private List<HealthCareUnit> findVerksamhetsChefHealthCareUnit(String vcHsaIdentity) {

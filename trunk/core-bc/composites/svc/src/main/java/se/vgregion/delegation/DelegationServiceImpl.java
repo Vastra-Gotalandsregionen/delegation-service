@@ -1,17 +1,16 @@
 package se.vgregion.delegation;
 
-import com.sun.tools.internal.ws.wsdl.framework.NoSuchEntityException;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import se.vgregion.delegation.domain.Delegation;
 import se.vgregion.delegation.domain.HealthCareUnit;
-import se.vgregion.delegation.domain.VerksamhetsChefInfo;
+import se.vgregion.delegation.domain.VardEnhetInfo;
 import se.vgregion.delegation.persistence.DelegationRepository;
 import se.vgregion.delegation.persistence.DelegationToRepository;
 import se.vgregion.delegation.persistence.HealthCareUnitDao;
-import se.vgregion.delegation.persistence.VerksamhetsChefDao;
+import se.vgregion.delegation.persistence.VardEnhetDao;
 
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
@@ -33,7 +32,7 @@ public class DelegationServiceImpl implements DelegationService {
     private DelegationToRepository delegationToRepository;
 
     @Autowired
-    private VerksamhetsChefDao verksamhetsChefDao;
+    private VardEnhetDao vardEnhetDao;
 
     @Autowired
     private HealthCareUnitDao healthCareUnitDao;
@@ -119,8 +118,8 @@ public class DelegationServiceImpl implements DelegationService {
     }
 
     @Override
-    public List<VerksamhetsChefInfo> lookupVerksamhetsChefInfo(String vcVgrId) {
-        return verksamhetsChefDao.find(vcVgrId);
+    public List<VardEnhetInfo> lookupVerksamhetsChefInfo(String vcVgrId) {
+        return vardEnhetDao.find(vcVgrId);
     }
 
     @Override

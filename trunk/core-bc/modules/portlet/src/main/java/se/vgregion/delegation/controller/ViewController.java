@@ -1,6 +1,5 @@
 package se.vgregion.delegation.controller;
 
-import com.liferay.portal.util.PortalUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,7 @@ import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import se.vgregion.delegation.DelegationService;
 import se.vgregion.delegation.domain.Delegation;
 import se.vgregion.delegation.domain.HealthCareUnit;
-import se.vgregion.delegation.domain.VerksamhetsChefInfo;
+import se.vgregion.delegation.domain.VardEnhetInfo;
 import se.vgregion.delegation.model.DelegationInfo;
 
 import javax.portlet.PortletRequest;
@@ -66,7 +65,7 @@ public class ViewController {
             Delegation activeDelegation = delegationService.activeDelegations(uid);
             Delegation pendingDelegation = delegationService.pendingDelegation(uid);
 
-            List<VerksamhetsChefInfo> vcInfoList = delegationService.lookupVerksamhetsChefInfo(uid);
+            List<VardEnhetInfo> vcInfoList = delegationService.lookupVerksamhetsChefInfo(uid);
 
             model.addAttribute("verksamhetsChefInfoList", vcInfoList);
             model.addAttribute("delegationInfo", new DelegationInfo());
