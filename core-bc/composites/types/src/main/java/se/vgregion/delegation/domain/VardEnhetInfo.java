@@ -8,11 +8,12 @@ import java.util.Collection;
  *
  * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
  */
-public class VerksamhetsChefInfo {
+public class VardEnhetInfo {
     PersonalInfo verksamhetsChef;
     HealthCareUnit vardEnhet;
     Collection<HealthCareUnit> ingaendeEnheter;
     HealthCareUnit vardGivare;
+    Collection<HsaCommission> uppdrag;
 
     public PersonalInfo getVerksamhetsChef() {
         return verksamhetsChef;
@@ -46,6 +47,14 @@ public class VerksamhetsChefInfo {
         this.vardGivare = vardGivare;
     }
 
+    public Collection<HsaCommission> getUppdrag() {
+        return uppdrag;
+    }
+
+    public void setUppdrag(Collection<HsaCommission> uppdrag) {
+        this.uppdrag = uppdrag;
+    }
+
     @Override
     public String toString() {
         StringBuilder memberUnitsBuffer = new StringBuilder("[");
@@ -74,10 +83,18 @@ public class VerksamhetsChefInfo {
             verksamhetsChefStr = verksamhetsChef.toString();
         }
 
-        return "VerksamhetsChefInfo-{" + verksamhetsChefStr +
-                ", vardEnhet=" + vardEnhetStr +
+        StringBuilder uppdragBuffer = new StringBuilder("[");
+        for (HsaCommission commission : uppdrag) {
+            if (uppdragBuffer.length() > 1) uppdragBuffer.append(", ");
+            uppdragBuffer.append(commission.getCn());
+        }
+        uppdragBuffer.append("]");
+
+        return "VardEnhet-{" + vardEnhetStr +
+                ", verksamhetsChef=" + verksamhetsChefStr +
                 ", ingaendeEnheter=" + memberUnitsBuffer +
                 ", vardGivare=" + vardGivarStr +
+                ", uppdrag=" + uppdragBuffer +
                 '}';
     }
 }

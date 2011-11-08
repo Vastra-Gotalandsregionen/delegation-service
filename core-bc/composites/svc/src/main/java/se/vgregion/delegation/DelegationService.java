@@ -3,7 +3,7 @@ package se.vgregion.delegation;
 import org.joda.time.DateTime;
 import se.vgregion.delegation.domain.Delegation;
 import se.vgregion.delegation.domain.HealthCareUnit;
-import se.vgregion.delegation.domain.VerksamhetsChefInfo;
+import se.vgregion.delegation.domain.VardEnhetInfo;
 
 import java.util.List;
 import java.util.Set;
@@ -60,7 +60,7 @@ public interface DelegationService {
 
     Delegation find(Long delegationId);
 
-    List<VerksamhetsChefInfo> lookupVerksamhetsChefInfo(String vcVgrId);
+    List<VardEnhetInfo> lookupVerksamhetsChefInfo(String vcVgrId);
 
     Set<HealthCareUnit> findAllVardEnhet();
 }

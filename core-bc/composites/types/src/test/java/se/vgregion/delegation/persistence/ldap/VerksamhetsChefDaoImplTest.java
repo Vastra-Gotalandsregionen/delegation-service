@@ -4,20 +4,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextAdapter;
-import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import se.vgregion.delegation.domain.HealthCareUnit;
 import se.vgregion.delegation.domain.PersonalInfo;
-import se.vgregion.delegation.domain.VerksamhetsChefInfo;
+import se.vgregion.delegation.domain.VardEnhetInfo;
 import se.vgregion.delegation.persistence.HealthCareUnitDao;
 import se.vgregion.delegation.persistence.PersonalInfoDao;
-import se.vgregion.delegation.persistence.VerksamhetsChefDao;
+import se.vgregion.delegation.persistence.VardEnhetDao;
 
 import javax.naming.Name;
 import java.util.Arrays;
@@ -42,7 +39,7 @@ public class VerksamhetsChefDaoImplTest extends AbstractJUnit4SpringContextTests
     private HealthCareUnitDao healthCareUnitDao;
 
     @InjectMocks
-    private VerksamhetsChefDao dao = new VerksamhetsChefDaoImpl();
+    private VardEnhetDao dao = new VardEnhetDaoImpl();
 
     @Before
     public void setUp() throws Exception {
@@ -123,10 +120,10 @@ public class VerksamhetsChefDaoImplTest extends AbstractJUnit4SpringContextTests
 
         when(vardEnhet.getHsaHealthCareUnitMembers()).thenReturn(new String[]{});
 
-        List<VerksamhetsChefInfo> result = dao.find("apa");
+        List<VardEnhetInfo> result = dao.find("apa");
         assertEquals(1, result.size());
 
-        VerksamhetsChefInfo vc = result.get(0);
+        VardEnhetInfo vc = result.get(0);
         assertSame(apa, vc.getVerksamhetsChef());
         assertSame(vardEnhet, vc.getVardEnhet());
         verify(vardEnhet).setPersonal(vePersonal);
@@ -185,10 +182,10 @@ public class VerksamhetsChefDaoImplTest extends AbstractJUnit4SpringContextTests
                 eq("(&(objectClass=person)(ou=in2)(StrukturGrupp=veDN)(StrukturGrupp=VGR))"))
         ).thenReturn(in2Personal);
 
-        List<VerksamhetsChefInfo> result = dao.find("apa");
+        List<VardEnhetInfo> result = dao.find("apa");
         assertEquals(1, result.size());
 
-        VerksamhetsChefInfo vc = result.get(0);
+        VardEnhetInfo vc = result.get(0);
         assertSame(apa, vc.getVerksamhetsChef());
         assertSame(vardEnhet, vc.getVardEnhet());
         verify(vardEnhet).setPersonal(vePersonal);
