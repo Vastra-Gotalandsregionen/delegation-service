@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import se.vgregion.delegation.DelegationService;
 import se.vgregion.delegation.domain.Delegation;
+import se.vgregion.delegation.domain.HealthCareUnit;
 import se.vgregion.delegation.domain.VerksamhetsChefInfo;
+import se.vgregion.delegation.model.DelegationInfo;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
@@ -20,6 +22,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static javax.portlet.PortletRequest.P3PUserInfos.USER_LOGIN_ID;
@@ -63,7 +66,13 @@ public class ViewController {
             Delegation activeDelegation = delegationService.activeDelegations(uid);
             Delegation pendingDelegation = delegationService.pendingDelegation(uid);
 
-            List<VerksamhetsChefInfo> vcInfo = delegationService.lookupVerksamhetsChefInfo(uid);
+            List<VerksamhetsChefInfo> vcInfoList = delegationService.lookupVerksamhetsChefInfo(uid);
+
+            model.addAttribute("verksamhetsChefInfoList", vcInfoList);
+            model.addAttribute("delegationInfo", new DelegationInfo());
+
+            Set<HealthCareUnit> allVardEnhets = delegationService.findAllVardEnhet();
+            model.addAttribute("allVardEnhets", allVardEnhets);
 
             String signResponseUrl = responseUrlBuilder(request, pendingDelegation);
 
