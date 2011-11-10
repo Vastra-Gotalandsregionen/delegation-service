@@ -2,7 +2,7 @@ package se.vgregion.handlers;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
-import se.vgregion.proxy.signera.signature.SignatureEnvelope;
+import se.vgregion.signera.signature._1.SignatureEnvelope;
 
 /**
  * Created by IntelliJ IDEA.
