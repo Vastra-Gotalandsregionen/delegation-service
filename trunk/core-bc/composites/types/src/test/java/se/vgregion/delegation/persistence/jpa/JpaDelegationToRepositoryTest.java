@@ -30,7 +30,7 @@ public class JpaDelegationToRepositoryTest extends AbstractTransactionalJUnit4Sp
 
     @Before
     public void setUp() throws Exception {
-        executeSqlScript("classpath:dbsetup/test-data.sql", false);
+        executeSqlScript("classpath:dbsetup/test-data-delegation.sql", false);
     }
 
     @Test

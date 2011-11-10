@@ -5,28 +5,20 @@ import org.apache.camel.Processor;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.component.http.HttpOperationFailedException;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import se.vgregion.delegation.DelegationService;
 import se.vgregion.delegation.domain.Delegation;
-import se.vgregion.proxy.signera.signature.SignatureEnvelope;
 
 import javax.annotation.Resource;
 
-import java.security.SignatureException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -52,7 +44,7 @@ public class SignatureResponseRouteBuilderTest {
     @DirtiesContext
     public void testIncoming() {
         final String body = "<?xml version=\"1.0\"?>" +
-                "<signatureEnvelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://signera.proxy.vgregion.se/signature\" >" +
+                "<signatureEnvelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://signera.vgregion.se/signature/1/\" >" +
                 "<errorCode>0</errorCode>" +
                 "<signatureName>A-123</signatureName>" +
                 "<signature>Apa</signature>" +
@@ -86,7 +78,7 @@ public class SignatureResponseRouteBuilderTest {
     @DirtiesContext
     public void testIncomingStoreFail() {
         final String body = "<?xml version=\"1.0\"?>" +
-                "<signatureEnvelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://signera.proxy.vgregion.se/signature\" >" +
+                "<signatureEnvelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://signera.vgregion.se/signature/1/\" >" +
                 "<errorCode>0</errorCode>" +
                 "<signatureName>A-123</signatureName>" +
                 "<signature>Apa</signature>" +

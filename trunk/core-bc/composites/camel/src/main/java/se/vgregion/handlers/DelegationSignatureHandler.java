@@ -5,7 +5,7 @@ import org.apache.camel.Exchange;
 import org.springframework.transaction.annotation.Transactional;
 import se.vgregion.delegation.DelegationService;
 import se.vgregion.delegation.domain.Delegation;
-import se.vgregion.proxy.signera.signature.SignatureEnvelope;
+import se.vgregion.signera.signature._1.SignatureEnvelope;
 
 import javax.annotation.Resource;
 
@@ -24,6 +24,7 @@ public class DelegationSignatureHandler implements SignatureHandler {
      * {@inheritDoc}
      */
     @Transactional
+    @Override
     public SignatureEnvelope storeSignature(SignatureEnvelope signatureEnvelope, Exchange exchange) {
         // 0: check for errors
         int errorCode = signatureEnvelope.getErrorCode();

@@ -1,7 +1,7 @@
 package se.vgregion.converters;
 
 import org.apache.camel.Converter;
-import se.vgregion.proxy.signera.signature.SignatureEnvelope;
+import se.vgregion.signera.signature._1.SignatureEnvelope;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -23,7 +23,7 @@ public class SignatureEnvelopConverter {
     @Converter
     public static SignatureEnvelope toSignatureEnvelope(String xml) {
         try {
-            JAXBContext jc = JAXBContext.newInstance("se.vgregion.proxy.signera.signature");
+            JAXBContext jc = JAXBContext.newInstance("se.vgregion.signera.signature._1");
             //Create marshaller
             Unmarshaller m = jc.createUnmarshaller();
             //Marshal object into file.
