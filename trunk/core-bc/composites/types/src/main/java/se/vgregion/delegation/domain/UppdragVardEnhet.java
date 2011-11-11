@@ -55,7 +55,7 @@ public class UppdragVardEnhet extends AbstractEntity<Long>
      * Adds an action to this change-set.
      *
      * IMPORTANT: The call to changeAllowed are aligned so that a check are made before trying to make and change.
-     * @param action - the action to be removed.
+     * @param action - the action to be added.
      */
     public void addAction(UppdragVardEnhetAction action) {
         changeAllowed();
@@ -68,7 +68,7 @@ public class UppdragVardEnhet extends AbstractEntity<Long>
     }
 
     /**
-     * Removes an action to this change-set.
+     * Removes an action from this change-set.
      *
      * IMPORTANT: The call to changeAllowed are aligned so that a check are made before trying to make and change.
      * @param action - the action to be removed.
@@ -76,7 +76,9 @@ public class UppdragVardEnhet extends AbstractEntity<Long>
     public void removeAction(UppdragVardEnhetAction action) {
         changeAllowed();
         UppdragVardEnhet oldUppdrag = action.getUppdragVardEnhet();
-        if (oldUppdrag != null && oldUppdrag.getUppdragVardEnhetActions().contains(action)) {
+        if (oldUppdrag != null
+                && oldUppdrag != this
+                && oldUppdrag.getUppdragVardEnhetActions().contains(action)) {
             oldUppdrag.removeAction(action);
         }
         action.setUppdragVardEnhet(null);

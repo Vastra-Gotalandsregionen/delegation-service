@@ -22,7 +22,9 @@ public class DelegationTo extends AbstractEntity<Long>
     @ManyToOne
     private Delegation delegation;
 
+    @Column(nullable = false)
     private String delegatedFor;
+    @Column(nullable = false)
     private String delegateTo;
 
     @Column
@@ -46,6 +48,7 @@ public class DelegationTo extends AbstractEntity<Long>
     }
 
     public void setDelegatedFor(String delegatedFor) {
+        changeAllowed();
         this.delegatedFor = delegatedFor;
     }
 
@@ -54,6 +57,7 @@ public class DelegationTo extends AbstractEntity<Long>
     }
 
     public void setDelegateTo(String delegateTo) {
+        changeAllowed();
         this.delegateTo = delegateTo;
     }
 
@@ -61,7 +65,8 @@ public class DelegationTo extends AbstractEntity<Long>
         return delegation;
     }
 
-    public void setDelegation(Delegation delegation) {
+    protected void setDelegation(Delegation delegation) {
+        changeAllowed();
         this.delegation = delegation;
     }
 
@@ -70,6 +75,7 @@ public class DelegationTo extends AbstractEntity<Long>
     }
 
     public void setValidFrom(Date validFrom) {
+        changeAllowed();
         this.validFrom = validFrom;
     }
 
@@ -78,6 +84,7 @@ public class DelegationTo extends AbstractEntity<Long>
     }
 
     public void setValidTo(Date validTo) {
+        changeAllowed();
         this.validTo = validTo;
     }
 
@@ -85,11 +92,19 @@ public class DelegationTo extends AbstractEntity<Long>
     public String toString() {
         return "DelegationTo{" +
                 "id=" + id +
-                ", delegation=" + delegation.getId() +
+                ", delegation=" + ((delegation != null) ? delegation.getId() : null) +
                 ", delegatedFor='" + delegatedFor + '\'' +
                 ", delegateTo='" + delegateTo + '\'' +
                 ", validFrom=" + validFrom +
                 ", validTo=" + validTo +
                 '}';
+    }
+
+    private void changeAllowed() {
+        if (delegation != null && delegation.getStatus() != DelegationStatus.PENDING) {
+            String msg = String.format("No change allowed, the delegation [%s - %s] for [%s] is locked.",
+                    delegation.getId(), delegation.getStatus().toString(), id);
+            throw new IllegalAccessError(msg);
+        }
     }
 }

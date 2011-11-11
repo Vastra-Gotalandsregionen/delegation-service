@@ -142,12 +142,12 @@ public class UppdragVardEnhetAction extends AbstractEntity<Long>
         return uppdragVardEnhet;
     }
 
-    public void setUppdragVardEnhet(UppdragVardEnhet uppdragVardEnhet) {
+    protected void setUppdragVardEnhet(UppdragVardEnhet uppdragVardEnhet) {
         changeAllowed();
         this.uppdragVardEnhet = uppdragVardEnhet;
     }
 
-    public void changeAllowed() {
+    private void changeAllowed() {
         if (uppdragVardEnhet != null && StringUtils.isNotBlank(uppdragVardEnhet.getSignToken())) {
             String msg = String.format("The UVE change-order [%s] is signed and change is not allowed",
                     uppdragVardEnhet.getId());

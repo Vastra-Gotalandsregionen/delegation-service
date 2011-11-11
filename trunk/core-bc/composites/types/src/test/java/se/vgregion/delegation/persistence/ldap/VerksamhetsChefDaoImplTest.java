@@ -78,7 +78,7 @@ public class VerksamhetsChefDaoImplTest extends AbstractJUnit4SpringContextTests
 
     @Test
     public void testIsVerksamhetsChefToManyFound() throws Exception {
-        when(personalInfoDao.lookup(eq("apa"))).thenThrow(new RuntimeException("felmeddelenda"));
+        when(personalInfoDao.lookup(eq("apa"))).thenThrow(new RuntimeException("felmeddelande"));
 
         assertFalse(dao.isVerksamhetsChef("apa"));
     }
