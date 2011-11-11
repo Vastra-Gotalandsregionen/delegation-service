@@ -45,13 +45,17 @@ public class UppdragVardEnhetAction extends AbstractEntity<Long>
     @Column(nullable = false)
     private String createdBy;
 
-    @Basic(optional = true)
-    @Column(insertable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date created = new Date();
+    private Date created;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = false)
     private UppdragVardEnhet uppdragVardEnhet;
+
+    @PrePersist
+    private void onCreate() {
+        created = new Date();
+    }
 
     @Override
     public Long getId() {
