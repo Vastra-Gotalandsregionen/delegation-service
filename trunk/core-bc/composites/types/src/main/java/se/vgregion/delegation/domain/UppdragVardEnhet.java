@@ -5,7 +5,6 @@ import org.joda.time.DateTime;
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 import javax.persistence.*;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
