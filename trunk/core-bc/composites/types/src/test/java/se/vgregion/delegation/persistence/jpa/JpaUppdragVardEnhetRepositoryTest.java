@@ -117,10 +117,10 @@ public class JpaUppdragVardEnhetRepositoryTest extends AbstractTransactionalJUni
             assertNotNull("action ["+actionCheck.getId()+"]", actionCheck.getCreated());
         }
 
-        Map result = simpleJdbcTemplate.queryForMap("select created from vgr_uppdrag_action" +
-                " where id = 1 and uppdragVardEnhet_id = -4");
+        Date result = simpleJdbcTemplate.queryForObject("select created from vgr_uppdrag_action" +
+                " where id = 1 and uppdragVardEnhet_id = -4", Date.class);
 
-        System.out.println(result);
+        assertNotNull(result);
     }
 
     @Test(expected = javax.persistence.PersistenceException.class)
