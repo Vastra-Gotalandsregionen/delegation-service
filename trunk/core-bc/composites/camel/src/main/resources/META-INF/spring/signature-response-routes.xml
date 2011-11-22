@@ -52,4 +52,8 @@
 
   <bean id="delegationSigningHandler" class="se.vgregion.handlers.DelegationSignatureHandler"/>
 
+  <bean id="persolnalInfoDao" class="se.vgregion.delegation.persistence.ldap.PersonalInfoDaoImpl" />
+  <bean id="vardEnhetDao" class="se.vgregion.delegation.persistence.ldap.VardEnhetDaoImpl" />
+  <bean id="healthCareUnitDao" class="se.vgregion.delegation.persistence.ldap.HealthCareUnitDaoImpl" />
+
 </beans>

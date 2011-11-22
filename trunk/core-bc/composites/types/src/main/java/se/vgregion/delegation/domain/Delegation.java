@@ -5,6 +5,7 @@ import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 import javax.persistence.*;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -28,7 +29,7 @@ public class Delegation extends AbstractEntity<Long>
     private String delegatedBy;
 
     @OneToMany(mappedBy = "delegation")
-    private Set<DelegationTo> delegationsTo;
+    private Set<DelegationTo> delegationsTo = new HashSet<DelegationTo>();
 
     @Column(nullable = true, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -110,6 +111,7 @@ public class Delegation extends AbstractEntity<Long>
 
     /**
      * Protected access to DelegationsTo handled.
+     * Use addDelegationTo, removeDelegationTo to change delegationsTo.
      *
      * @return An unmodifiable representation of delegations.
      */

@@ -7,7 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.portlet.bind.annotation.ActionMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import se.vgregion.delegation.DelegationService;
 import se.vgregion.delegation.domain.Delegation;
@@ -15,6 +19,7 @@ import se.vgregion.delegation.domain.HealthCareUnit;
 import se.vgregion.delegation.domain.VardEnhetInfo;
 import se.vgregion.delegation.model.DelegationInfo;
 
+import javax.portlet.ActionRequest;
 import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import java.net.InetAddress;
@@ -33,7 +38,7 @@ import static javax.portlet.PortletRequest.USER_INFO;
  *
  * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
  */
-
+@SessionAttributes({"vardEnhetInfo"})
 @Controller
 @RequestMapping("VIEW")
 public class ViewController {
@@ -58,6 +63,64 @@ public class ViewController {
     private DelegationService delegationService;
 
     @RenderMapping
+    public String showChooseVardEnhetView(RenderRequest request, Model model) {
+        String uid = lookupUid(request);
+        // TODO: Remove test vcVgrId
+        uid = "tombr";
+
+        List<VardEnhetInfo> vcInfoList = delegationService.lookupVerksamhetsChefInfo(uid);
+        if (vcInfoList.size() > 0) {
+            model.addAttribute("vcVgrId", uid);
+            if (vcInfoList.size() > 1) {
+                model.addAttribute("vardEnhetInfoList", vcInfoList);
+                return "chooseVardEnhetView";
+            }
+            model.addAttribute("vardEnhetInfo", vcInfoList.get(0));
+            return "currentDelegationView";
+        } else {
+            return "error";
+        }
+    }
+
+    @RenderMapping(params = "view=activeDelegation")
+    public String showCurrentDelegationView(RenderRequest request,
+            @RequestParam("vcVgrId") String vcVgrId,
+            @ModelAttribute(value = "vardEnhetInfo") VardEnhetInfo vardEnhetInfo,
+            Model model) {
+        try {
+            model.addAttribute("vcVgrId", vcVgrId);
+            model.addAttribute("vardEnhetInfo", vardEnhetInfo);
+
+            Delegation activeDelegation = delegationService.activeDelegations(vcVgrId);
+            model.addAttribute("activeDelegation", activeDelegation);
+
+            return "activeDelegationView";
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "error";
+        }
+    }
+
+    @RenderMapping(params = "view=editDelegation")
+    public String showPendingDelegationView(RenderRequest request,
+            @RequestParam("vcVgrId") String vcVgrId,
+            @ModelAttribute(value = "vardEnhetInfo") VardEnhetInfo vardEnhetInfo,
+            Model model) {
+        try {
+            model.addAttribute("vcVgrId", vcVgrId);
+            model.addAttribute("vardEnhetInfo", vardEnhetInfo);
+
+            Delegation pendingDelegation = delegationService.pendingDelegation(vcVgrId);
+            model.addAttribute("pendingDelegation", pendingDelegation);
+
+            return "pendingDelegationView";
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "error";
+        }
+    }
+
+    // TODO: remove this
     public String showView(RenderRequest request, Model model) {
         try {
             String uid = lookupUid(request);
