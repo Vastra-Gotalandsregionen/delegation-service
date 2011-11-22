@@ -28,7 +28,7 @@ public class DelegationServiceImpl implements DelegationService {
     @Autowired
     private DelegationRepository delegationRepository;
 
-    @Autowired
+    @Autowired(required = false)
     private DelegationToRepository delegationToRepository;
 
     @Autowired
