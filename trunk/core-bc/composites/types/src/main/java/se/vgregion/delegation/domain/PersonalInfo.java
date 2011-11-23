@@ -1,12 +1,14 @@
 package se.vgregion.delegation.domain;
 
+import java.io.Serializable;
+
 /**
  * Created by IntelliJ IDEA.
  * Created: 2011-10-19 11:20
  *
  * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
  */
-public class PersonalInfo {
+public class PersonalInfo implements Serializable {
     String dn;
     String uid;
     String givenName;

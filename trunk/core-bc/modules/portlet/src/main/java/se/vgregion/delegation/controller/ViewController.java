@@ -1,6 +1,7 @@
 package se.vgregion.delegation.controller;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,20 +15,17 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.portlet.bind.annotation.ActionMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import se.vgregion.delegation.DelegationService;
-import se.vgregion.delegation.domain.Delegation;
-import se.vgregion.delegation.domain.HealthCareUnit;
-import se.vgregion.delegation.domain.VardEnhetInfo;
+import se.vgregion.delegation.domain.*;
 import se.vgregion.delegation.model.DelegationInfo;
+import se.vgregion.delegation.model.SearchPerson;
 
 import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
 import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static javax.portlet.PortletRequest.P3PUserInfos.USER_LOGIN_ID;
 import static javax.portlet.PortletRequest.USER_INFO;
@@ -65,8 +63,6 @@ public class ViewController {
     @RenderMapping
     public String showChooseVardEnhetView(RenderRequest request, Model model) {
         String uid = lookupUid(request);
-        // TODO: Remove test vcVgrId
-        uid = "tombr";
 
         List<VardEnhetInfo> vcInfoList = delegationService.lookupVerksamhetsChefInfo(uid);
         if (vcInfoList.size() > 0) {
@@ -76,7 +72,7 @@ public class ViewController {
                 return "chooseVardEnhetView";
             }
             model.addAttribute("vardEnhetInfo", vcInfoList.get(0));
-            return "currentDelegationView";
+            return "activeDelegationView";
         } else {
             return "error";
         }
@@ -84,10 +80,11 @@ public class ViewController {
 
     @RenderMapping(params = "view=activeDelegation")
     public String showCurrentDelegationView(RenderRequest request,
-            @RequestParam("vcVgrId") String vcVgrId,
             @ModelAttribute(value = "vardEnhetInfo") VardEnhetInfo vardEnhetInfo,
             Model model) {
         try {
+            String vcVgrId = lookupUid(request);
+
             model.addAttribute("vcVgrId", vcVgrId);
             model.addAttribute("vardEnhetInfo", vardEnhetInfo);
 
@@ -101,17 +98,19 @@ public class ViewController {
         }
     }
 
-    @RenderMapping(params = "view=editDelegation")
+    @RenderMapping(params = "view=pendingDelegation")
     public String showPendingDelegationView(RenderRequest request,
-            @RequestParam("vcVgrId") String vcVgrId,
             @ModelAttribute(value = "vardEnhetInfo") VardEnhetInfo vardEnhetInfo,
             Model model) {
         try {
+            String vcVgrId = lookupUid(request);
+
             model.addAttribute("vcVgrId", vcVgrId);
             model.addAttribute("vardEnhetInfo", vardEnhetInfo);
 
             Delegation pendingDelegation = delegationService.pendingDelegation(vcVgrId);
             model.addAttribute("pendingDelegation", pendingDelegation);
+            model.addAttribute("delegationsToSize", pendingDelegation.getDelegationsTo().size());
 
             return "pendingDelegationView";
         } catch (Exception ex) {
@@ -119,6 +118,45 @@ public class ViewController {
             return "error";
         }
     }
+
+    @RenderMapping(params = "view=searchPersonView")
+    public String showSearchPersonView(Model model,
+            @ModelAttribute(value = "vardEnhetInfo") VardEnhetInfo vardEnhetInfo) {
+        model.addAttribute("search", new SearchPerson());
+
+        Collection<PersonalInfo> allPersonal = new ArrayList(vardEnhetInfo.getVardEnhet().getPersonal());
+        for (HealthCareUnit ingaende: vardEnhetInfo.getIngaendeEnheter()) {
+            allPersonal.addAll(ingaende.getPersonal());
+        }
+        model.addAttribute("vardEnhetInfoPersonalList", allPersonal);
+        model.addAttribute("vardEnhetInfoPersonalListSize", allPersonal.size());
+
+        return "searchPersonView";
+    }
+
+    @ActionMapping(params = "action=addPerson")
+    public void addPerson(ActionRequest request, ActionResponse response,
+            @RequestParam("vgrId") String vgrId,
+            Model model) {
+        String vcVgrId = lookupUid(request);
+
+        Delegation pendingDelegation = delegationService.pendingDelegation(vcVgrId);
+
+        DelegationTo to = new DelegationTo();
+        to.setDelegateTo(vgrId);
+        to.setDelegatedFor("UppdragsBeställning");
+
+        DateTime now = new DateTime();
+        to.setValidFrom(new Date(now.getMillis()));
+        to.setValidTo(new Date(now.plusMonths(12).getMillis()));
+
+        pendingDelegation.addDelegationTo(to);
+
+        delegationService.save(pendingDelegation);
+
+        response.setRenderParameter("view", "pendingDelegation");
+    }
+
 
     // TODO: remove this
     public String showView(RenderRequest request, Model model) {
@@ -165,6 +203,9 @@ public class ViewController {
         if (userInfo != null && userInfo.get(USER_LOGIN_ID.toString()) != null) {
             userId = (String) userInfo.get(USER_LOGIN_ID.toString());
         }
+        // TODO: Remove test vcVgrId
+        userId = "tombr";
+
         return userId;
     }
 

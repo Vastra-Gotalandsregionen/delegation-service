@@ -1,5 +1,6 @@
 package se.vgregion.delegation.domain;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 /**
@@ -8,7 +9,7 @@ import java.util.Collection;
  *
  * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
  */
-public class VardEnhetInfo {
+public class VardEnhetInfo implements Serializable {
     PersonalInfo verksamhetsChef;
     HealthCareUnit vardEnhet;
     Collection<HealthCareUnit> ingaendeEnheter;

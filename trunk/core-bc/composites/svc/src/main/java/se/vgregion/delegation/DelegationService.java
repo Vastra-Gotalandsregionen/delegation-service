@@ -63,4 +63,6 @@ public interface DelegationService {
     List<VardEnhetInfo> lookupVerksamhetsChefInfo(String vcVgrId);
 
     Set<HealthCareUnit> findAllVardEnhet();
+
+    void save(Delegation delegation);
 }

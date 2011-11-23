@@ -16,16 +16,19 @@
     <%@ include file="/css/delegation.css" %>
 </style>
 
+<portlet:renderURL var="activeDelegation" portletMode="VIEW">
+    <portlet:param name="view" value="activeDelegation"/>
+</portlet:renderURL>
+
 <portlet:renderURL var="pendingDelegation" portletMode="VIEW">
-    <portlet:param name="view" value="editDelegation"/>
-    <portlet:param name="vcVgrId" value="${vcVgrId}"/>
+    <portlet:param name="view" value="pendingDelegation"/>
 </portlet:renderURL>
 
 
 <div>
     <h1>Delegeringar</h1>
     <hr/>
-    <span>Aktuella delegeringar</span> <span><a href="${pendingDelegation}">Skapa ny delegering</a></span>
+        <liferay-ui:tabs names="activeDelegation,pendingDelegation" url="${pendingDelegation}" />
     <hr/>
     <div>Vårdenhet: ${vardEnhetInfo.vardEnhet.ou} [${vardEnhetInfo.verksamhetsChef.fullName}]</div>
 

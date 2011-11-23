@@ -18,20 +18,31 @@
 
 <portlet:renderURL var="activeDelegation" portletMode="VIEW">
     <portlet:param name="view" value="activeDelegation"/>
-    <portlet:param name="vcVgrId" value="${vcVgrId}"/>
+</portlet:renderURL>
+
+<portlet:renderURL var="pendingDelegation" portletMode="VIEW">
+    <portlet:param name="view" value="pendingDelegation"/>
+</portlet:renderURL>
+
+<portlet:renderURL var="searchPersonView">
+    <portlet:param name="view" value="searchPersonView"/>
 </portlet:renderURL>
 
 
-<div>
+<div class="delegation">
     <h1>Delegeringar</h1>
     <hr/>
-    <span><a href="${activeDelegation}">Aktuella delegeringar</a></span><span>Skapa ny delegering</span>
+    <liferay-ui:tabs names="activeDelegation,
+    pendingDelegation" url="${activeDelegation}" />
     <hr/>
     <div>Vårdenhet: ${vardEnhetInfo.vardEnhet.ou} [${vardEnhetInfo.verksamhetsChef.fullName}]</div>
     <hr/>
     <div>
         <div>Delegera till</div>
-        <div>Image <span>Sök person</span></div>
+        <div>
+            <img src="<c:url value="/image/person.png"/>"/>
+            <aui:button onClick="${searchPersonView}" value="Sök person"/>
+        </div>
         <div>- Gäller för behörighetsbeställning och attest</div>
     </div>
     <hr/>
@@ -40,11 +51,12 @@
         <div><span>Today</span><span>Period: 1 år framåt</span></div>
     </div>
     <c:if test="${pendingDelegation != null}">
-        <c:if test="${not empty pendingDelegation.delegationsTo}">
+        <c:if test="${delegationsToSize gt 0}">
             <hr/>
             <div>Delegeringar</div>
-            <liferay-ui:search-container id="delegation" delta="10" iteratorURL="${iteratorURL}">
-                <liferay-ui:search-container-results results="${pendingDelegation.delegationsTo}" total=""/>
+            <liferay-ui:search-container id="delegation" delta="10" iteratorURL="${pendingDelegation}">
+                <liferay-ui:search-container-results results="${pendingDelegation.delegationsTo}"
+                                                     total="${delegationsToSize}"/>
                 <liferay-ui:search-container-row className="se.vgregion.delegation.domain.DelegationTo"
                                                  keyProperty="delegationTo">
                     <portlet:actionURL var="userInfo" name="userInfo" portletMode="VIEW">

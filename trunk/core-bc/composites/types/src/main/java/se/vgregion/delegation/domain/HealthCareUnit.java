@@ -1,6 +1,8 @@
 package se.vgregion.delegation.domain;
 
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Created by IntelliJ IDEA.
@@ -8,7 +10,7 @@ import java.util.Collection;
  *
  * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
  */
-public class HealthCareUnit {
+public class HealthCareUnit implements Serializable {
     String dn;
     String ou;
     String hsaIdentity;
@@ -63,7 +65,7 @@ public class HealthCareUnit {
     }
 
     public Collection<PersonalInfo> getPersonal() {
-        return personal;
+        return Collections.unmodifiableCollection(personal);
     }
 
     public void setPersonal(Collection<PersonalInfo> personal) {
