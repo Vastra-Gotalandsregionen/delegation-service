@@ -1,3 +1,7 @@
 h1 {
     color: blue;
 }
+.image-person {
+    background-image: url("image/person.png");
+
+}

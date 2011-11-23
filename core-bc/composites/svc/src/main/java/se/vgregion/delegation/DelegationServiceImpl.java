@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import se.vgregion.delegation.domain.Delegation;
 import se.vgregion.delegation.domain.HealthCareUnit;
 import se.vgregion.delegation.domain.VardEnhetInfo;
@@ -125,6 +126,12 @@ public class DelegationServiceImpl implements DelegationService {
     @Override
     public Set<HealthCareUnit> findAllVardEnhet() {
         return healthCareUnitDao.findAll();
+    }
+
+    @Override
+    @Transactional
+    public void save(Delegation delegation) {
+        delegationRepository.store(delegation);
     }
 
     /**
