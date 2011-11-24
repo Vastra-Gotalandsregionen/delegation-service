@@ -119,22 +119,31 @@ public class ViewController {
         }
     }
 
+
     @RenderMapping(params = "view=searchPersonView")
     public String showSearchPersonView(Model model,
+            @RequestParam(value = "currentPage", required = false) Integer currentPage,
             @ModelAttribute(value = "vardEnhetInfo") VardEnhetInfo vardEnhetInfo) {
         model.addAttribute("search", new SearchPerson());
 
-        Collection<PersonalInfo> allPersonal = new ArrayList(vardEnhetInfo.getVardEnhet().getPersonal());
-        for (HealthCareUnit ingaende: vardEnhetInfo.getIngaendeEnheter()) {
-            allPersonal.addAll(ingaende.getPersonal());
+        if (currentPage == null) {
+            currentPage = 0;
         }
-        model.addAttribute("vardEnhetInfoPersonalList", allPersonal);
+
+        Map<HealthCareUnit, Collection<PersonalInfo>> allPersonal =
+                new HashMap<HealthCareUnit, Collection<PersonalInfo>>();
+        allPersonal.put(vardEnhetInfo.getVardEnhet(), vardEnhetInfo.getVardEnhet().getPersonal());
+        // IngaendeEnhets
+        for (HealthCareUnit ingaende: vardEnhetInfo.getIngaendeEnheter()) {
+            allPersonal.put(ingaende, ingaende.getPersonal());
+        }
+        model.addAttribute("vardEnhetInfoPersonalMap", allPersonal);
         model.addAttribute("vardEnhetInfoPersonalListSize", allPersonal.size());
 
         return "searchPersonView";
     }
 
-    @ActionMapping(params = "action=addPerson")
+    @ActionMapping("addPersonal")
     public void addPerson(ActionRequest request, ActionResponse response,
             @RequestParam("vgrId") String vgrId,
             Model model) {

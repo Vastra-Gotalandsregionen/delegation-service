@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import se.vgregion.delegation.domain.Delegation;
+import se.vgregion.delegation.domain.DelegationStatus;
 import se.vgregion.delegation.domain.HealthCareUnit;
 import se.vgregion.delegation.domain.VardEnhetInfo;
 import se.vgregion.delegation.persistence.DelegationRepository;
@@ -85,6 +86,8 @@ public class DelegationServiceImpl implements DelegationService {
             Delegation activeDelegation = activeDelegations(vcVgrId);
             if (activeDelegation == null) {
                 delegation = new Delegation();
+                delegation.setStatus(DelegationStatus.PENDING);
+                delegation.setDelegatedBy(vcVgrId);
             } else {
                 delegation = delegationRepository.clone(activeDelegation);
             }
