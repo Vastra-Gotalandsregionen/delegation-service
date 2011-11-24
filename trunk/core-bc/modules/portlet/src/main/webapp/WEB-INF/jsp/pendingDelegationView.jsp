@@ -10,6 +10,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="liferay-ui" uri="http://liferay.com/tld/ui" %>
 <%@ taglib prefix="aui" uri="http://liferay.com/tld/aui" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 
 <style type="text/css">
@@ -20,7 +21,7 @@
     <portlet:param name="view" value="activeDelegation"/>
 </portlet:renderURL>
 
-<portlet:renderURL var="pendingDelegation" portletMode="VIEW">
+<portlet:renderURL var="pendingDelegationView" portletMode="VIEW">
     <portlet:param name="view" value="pendingDelegation"/>
 </portlet:renderURL>
 
@@ -33,7 +34,7 @@
     <h1>Delegeringar</h1>
     <hr/>
     <liferay-ui:tabs names="activeDelegation,
-    pendingDelegation" url="${activeDelegation}" />
+    pendingDelegationView" url="${activeDelegation}"/>
     <hr/>
     <div>Vårdenhet: ${vardEnhetInfo.vardEnhet.ou} [${vardEnhetInfo.verksamhetsChef.fullName}]</div>
     <hr/>
@@ -54,22 +55,30 @@
         <c:if test="${delegationsToSize gt 0}">
             <hr/>
             <div>Delegeringar</div>
-            <liferay-ui:search-container id="delegation" delta="10" iteratorURL="${pendingDelegation}">
-                <liferay-ui:search-container-results results="${pendingDelegation.delegationsTo}"
-                                                     total="${delegationsToSize}"/>
-                <liferay-ui:search-container-row className="se.vgregion.delegation.domain.DelegationTo"
-                                                 keyProperty="delegationTo">
-                    <portlet:actionURL var="userInfo" name="userInfo" portletMode="VIEW">
-                        <portlet:param name="vgrId" value="${delegationTo.id}"/>
-                    </portlet:actionURL>
+            <table>
+                <c:forEach items="${pendingDelegation.delegationsTo}" var="to">
+                    <tr>
+                        <td>${to.delegateTo}</td>
+                        <td>${to.validTo}</td>
+                    </tr>
+                </c:forEach>
+            </table>
+            <%--<liferay-ui:search-container id="delegation" delta="10" iteratorURL="${pendingDelegationView}">--%>
+                <%--<liferay-ui:search-container-results results="${pendingDelegation.delegationsTo}"--%>
+                                                     <%--total="${delegationsToSize}"/>--%>
+                <%--<liferay-ui:search-container-row className="se.vgregion.delegation.domain.DelegationTo"--%>
+                                                 <%--keyProperty="delegationTo">--%>
+                    <%--<portlet:actionURL var="userInfo" name="userInfo" portletMode="VIEW">--%>
+                        <%--<portlet:param name="vgrId" value="${delegationTo.id}"/>--%>
+                    <%--</portlet:actionURL>--%>
 
-                    <liferay-ui:search-container-column-text name="VGRID" property="delegateTo"/>
-                    <liferay-ui:search-container-column-text name="Gäller till" property="validTo"/>
-                    <liferay-ui:search-container-column-text>
-                        <a href="${userInfo}" class="info-img">i</a>
-                    </liferay-ui:search-container-column-text>
-                </liferay-ui:search-container-row>
-            </liferay-ui:search-container>
+                    <%--<liferay-ui:search-container-column-text name="VGRID" property="delegateTo"/>--%>
+                    <%--<liferay-ui:search-container-column-text name="Gäller till" property="validTo"/>--%>
+                    <%--<liferay-ui:search-container-column-text>--%>
+                        <%--<a href="${userInfo}" class="info-img">i</a>--%>
+                    <%--</liferay-ui:search-container-column-text>--%>
+                <%--</liferay-ui:search-container-row>--%>
+            <%--</liferay-ui:search-container>--%>
         </c:if>
     </c:if>
     <hr/>

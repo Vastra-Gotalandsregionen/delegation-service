@@ -28,7 +28,7 @@ public class Delegation extends AbstractEntity<Long>
 
     private String delegatedBy;
 
-    @OneToMany(mappedBy = "delegation")
+    @OneToMany(mappedBy = "delegation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<DelegationTo> delegationsTo = new HashSet<DelegationTo>();
 
     @Column(nullable = true, updatable = false)
@@ -116,7 +116,8 @@ public class Delegation extends AbstractEntity<Long>
      * @return An unmodifiable representation of delegations.
      */
     public Set<DelegationTo> getDelegationsTo() {
-        return Collections.unmodifiableSet(delegationsTo);
+//        return Collections.unmodifiableSet(delegationsTo);
+        return delegationsTo;
     }
 
     public Date getRevokedOn() {
@@ -142,7 +143,7 @@ public class Delegation extends AbstractEntity<Long>
     }
 
     public void setStatus(DelegationStatus status) {
-        changeAllowed();
+        if (this.status != null) changeAllowed();
         this.status = status;
     }
 
@@ -163,7 +164,7 @@ public class Delegation extends AbstractEntity<Long>
     private void changeAllowed() {
         if (status != DelegationStatus.PENDING) {
             String msg = String.format("No change allowed, the delegation [%s - %s] is locked.",
-                    id, status.toString());
+                    id != null ? id : "", status.toString());
             throw new IllegalAccessError(msg);
         }
     }
