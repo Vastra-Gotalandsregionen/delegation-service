@@ -1,8 +1,8 @@
-<%--
+
   Created by IntelliJ IDEA.
   Created: 2011-11-22 15:28 
   @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
---%>
+
 <%@ taglib prefix="portlet" uri="http://java.sun.com/portlet_2_0" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -63,22 +63,22 @@
                     </tr>
                 </c:forEach>
             </table>
-            <%--<liferay-ui:search-container id="delegation" delta="10" iteratorURL="${pendingDelegationView}">--%>
-                <%--<liferay-ui:search-container-results results="${pendingDelegation.delegationsTo}"--%>
-                                                     <%--total="${delegationsToSize}"/>--%>
-                <%--<liferay-ui:search-container-row className="se.vgregion.delegation.domain.DelegationTo"--%>
-                                                 <%--keyProperty="delegationTo">--%>
-                    <%--<portlet:actionURL var="userInfo" name="userInfo" portletMode="VIEW">--%>
-                        <%--<portlet:param name="vgrId" value="${delegationTo.id}"/>--%>
-                    <%--</portlet:actionURL>--%>
+            <liferay-ui:search-container id="delegation" delta="10" iteratorURL="${pendingDelegationView}">
+                <liferay-ui:search-container-results results="${pendingDelegation.delegationsTo}"
+                                                     <total="${delegationsToSize}"/>
+                <liferay-ui:search-container-row className="se.vgregion.delegation.domain.DelegationTo"
+                                                 keyProperty="delegationTo">
+                    <portlet:actionURL var="userInfo" name="userInfo" portletMode="VIEW">
+                        <portlet:param name="vgrId" value="${delegationTo.id}"/>
+                    </portlet:actionURL>
 
-                    <%--<liferay-ui:search-container-column-text name="VGRID" property="delegateTo"/>--%>
-                    <%--<liferay-ui:search-container-column-text name="Gäller till" property="validTo"/>--%>
-                    <%--<liferay-ui:search-container-column-text>--%>
-                        <%--<a href="${userInfo}" class="info-img">i</a>--%>
-                    <%--</liferay-ui:search-container-column-text>--%>
-                <%--</liferay-ui:search-container-row>--%>
-            <%--</liferay-ui:search-container>--%>
+                    <liferay-ui:search-container-column-text name="VGRID" property="delegateTo"/>
+                    <liferay-ui:search-container-column-text name="Gäller till" property="validTo"/>
+                    <liferay-ui:search-container-column-text>
+                        <a href="${userInfo}" class="info-img">i</a>
+                    </liferay-ui:search-container-column-text>
+                </liferay-ui:search-container-row>
+            </liferay-ui:search-container>
         </c:if>
     </c:if>
     <hr/>

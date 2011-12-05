@@ -98,7 +98,25 @@ Generation time : 2011-10-07 13:31:17 CEST
       <version>${liferay.version}</version>
       <scope>provided</scope>
     </dependency>
+      <dependency>
+      <groupId>com.liferay.portal</groupId>
+      <artifactId>util-taglib</artifactId>
+      <version>6.0.12</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.liferay.portal</groupId>
+      <artifactId>portal-impl</artifactId>
+      <version>6.0.12</version>
+      <scope>provided</scope>
+    </dependency>
+
+    
+    
   </dependencies>
+  
+  
+
 
   <profiles>
     <profile>
