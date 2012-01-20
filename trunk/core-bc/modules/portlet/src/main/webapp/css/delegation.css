@@ -5,3 +5,37 @@ h1 {
     background-image: url("image/person.png");
 
 }
+
+.tabview-list {
+    clear: both;
+    display: block;
+    content: "";
+    height: 22px;
+
+    border: 1px solid #C8C9CA;
+    padding: 4px;
+    margin: 0;
+
+    list-style: none outside none;
+    border-radius: 4px 4px 4px 4px;
+}
+
+.tab {
+    background: none repeat scroll 0 0 transparent;
+    border-width: 0;
+    font-weight: bold;
+}
+
+.tab-content {
+    padding: 3px 10px;
+    float: left;
+    border-radius: 4px 4px 4px 4px;
+}
+
+.tab-label {
+}
+
+.tab-active {
+    color: white;
+    background-color: black;
+}

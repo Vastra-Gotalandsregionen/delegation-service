@@ -28,7 +28,18 @@
 <div>
     <h1>Delegeringar</h1>
     <hr/>
-        <liferay-ui:tabs names="activeDelegation,pendingDelegation" url="${pendingDelegation}" />
+    <ul class="tabview-list">
+        <li class="tab">
+            <span class="tab-content tab-active">
+                <span class="tab-label">activeDelegation</span>
+            </span>
+        </li>
+        <li class="tab">
+            <span class="tab-content">
+                <span class="tab-label"><a href="${pendingDelegation}">pendingDelegation</a></span>
+            </span>
+        </li>
+    </ul>
     <hr/>
     <div>Vårdenhet: ${vardEnhetInfo.vardEnhet.ou} [${vardEnhetInfo.verksamhetsChef.fullName}]</div>
 
