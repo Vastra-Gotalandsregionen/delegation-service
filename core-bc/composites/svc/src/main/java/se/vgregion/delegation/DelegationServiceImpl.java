@@ -1,149 +1,85 @@
 package se.vgregion.delegation;
 
-import org.joda.time.DateTime;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import se.vgregion.delegation.domain.Delegation;
-import se.vgregion.delegation.domain.DelegationStatus;
-import se.vgregion.delegation.domain.HealthCareUnit;
-import se.vgregion.delegation.domain.VardEnhetInfo;
-import se.vgregion.delegation.persistence.DelegationRepository;
-import se.vgregion.delegation.persistence.DelegationToRepository;
-import se.vgregion.delegation.persistence.HealthCareUnitDao;
-import se.vgregion.delegation.persistence.VardEnhetDao;
 
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import se.vgregion.delegation.domain.Delegation;
+import se.vgregion.delegation.domain.DelegationBlock;
+import se.vgregion.delegation.persistence.DelegationBlockRepository;
+import se.vgregion.delegation.persistence.DelegationRepository;
 
 /**
- * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
+ * @author Simon Göransson
+ * @author Claes Lundahl
+ * 
  */
 public class DelegationServiceImpl implements DelegationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DelegationServiceImpl.class);
 
     @Autowired
-    private DelegationRepository delegationRepository;
+    private DelegationBlockRepository delegationBlockRepository;
 
     @Autowired(required = false)
-    private DelegationToRepository delegationToRepository;
-
-    @Autowired
-    private VardEnhetDao vardEnhetDao;
-
-    @Autowired
-    private HealthCareUnitDao healthCareUnitDao;
+    private DelegationRepository delegationRepository;
 
     @Override
-    public Delegation activeDelegations(String vcVgrId) {
-        try {
-            return delegationRepository.activeDelegation(vcVgrId);
-        } catch (NoResultException ex) {
-            return null;
-        } catch (NonUniqueResultException ex) {
-            LOGGER.error("Delegation databas is in an inconsistent state, " +
-                    "multiple ACTIVE delegations for VerksamhetChef ["+vcVgrId+"]");
-            throw new RuntimeException(ex);
-        }
+    public List<Delegation> getActiveDelegations(String delegatedFor) {
+        return delegationRepository.getActiveDelegations(delegatedFor);
+
     }
 
     @Override
-    public List<Delegation> delegatedBy(String vcVgrId) {
-        return delegationRepository.delegatedBy(vcVgrId);
+    public List<Delegation> getInActiveDelegations(String delegatedFor) {
+        return delegationRepository.getInActiveDelegations(delegatedFor);
     }
 
     @Override
-    public Delegation delegatedBy(String vcVgrId, DateTime on) {
-        try {
-            return delegationRepository.delegatedOn(vcVgrId, new Date(on.getMillis()));
-        } catch (NoResultException ex) {
-            return null;
-        } catch (NonUniqueResultException ex) {
-            LOGGER.error("Delegation databas is in an inconsistent state, " +
-                    "there where multiple ACTIVE delegations for VerksamhetChef ["+vcVgrId+"] on ["+on+"]");
-            throw new RuntimeException(ex);
-        }
-    }
-
-    /**
-     * Fetch the pending delegation made by Verksamhets-Chef.
-     * If no pending delegation found, copy active delegation and return that.
-     *
-     * @param vcVgrId - vgrId for Verksamhets-Chef
-     * @return
-     */
-    @Override
-    public Delegation pendingDelegation(String vcVgrId) {
-        Delegation delegation = null;
-        try {
-            delegation = delegationRepository.pendingDelegation(vcVgrId);
-        } catch (NoResultException ex) {
-            Delegation activeDelegation = activeDelegations(vcVgrId);
-            if (activeDelegation == null) {
-                delegation = new Delegation();
-                delegation.setStatus(DelegationStatus.PENDING);
-                delegation.setDelegatedBy(vcVgrId);
-            } else {
-                delegation = delegationRepository.clone(activeDelegation);
-            }
-        } catch (NonUniqueResultException ex) {
-            LOGGER.error("Delegation databas is in an inconsistent state, " +
-                    "there where multiple PENDING delegations for VerksamhetChef ["+vcVgrId+"]");
-            throw new RuntimeException(ex);
-        }
-        return delegation;
+    public List<Delegation> getDelegations(String delegatedFor) {
+        return delegationRepository.getDelegations(delegatedFor);
     }
 
     @Override
-    public List<Delegation> delegatedTo(String vgrId) {
-        return new ArrayList<Delegation>();
-    }
-
-
-    @Override
-    public boolean approve(Delegation delegation, String signToken) {
-        return false;
+    public List<Delegation> getDelegationsByRole(String delegatedTo, String role) {
+        return delegationRepository.getDelegationsByRole(delegatedTo, role);
     }
 
     @Override
-    public Delegation extend(Long oldDelegationId, String createdBy, DateTime newFrom, DateTime newTo) {
-        Delegation newDelegation = new Delegation();
-        return newDelegation;
-    }
-
-    @Override
-    public Delegation find(Long delegationId) {
-        return delegationRepository.find(delegationId);
-    }
-
-    @Override
-    public List<VardEnhetInfo> lookupVerksamhetsChefInfo(String vcVgrId) {
-        return vardEnhetDao.find(vcVgrId);
-    }
-
-    @Override
-    public Set<HealthCareUnit> findAllVardEnhet() {
-        return healthCareUnitDao.findAll();
+    public Delegation getDelegation(Long delegationId) {
+        return delegationRepository.getDelegation(delegationId);
     }
 
     @Override
     @Transactional
-    public void save(Delegation delegation) {
-        delegationRepository.store(delegation);
+    public boolean save(DelegationBlock delegationBlock) {
+
+        if (validateSigning(delegationBlock)) {
+            delegationBlockRepository.store(delegationBlock);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hasDelegations(String delegatedFor, String delegatedTo, String role) {
+        return delegationRepository.hasDelegations(delegatedFor, delegatedTo, role);
     }
 
     /**
      * Validate that signToken is signed by signer.
-     *
+     * 
      * @param delegation
      * @return
      */
-    private boolean validateSigning(Delegation delegation) {
+    private boolean validateSigning(DelegationBlock delegation) {
+        // TODO check if the signtoken is valid using the signservice.
+        if (delegation.getSignToken() != null) {
+            return true;
+        }
         return false;
     }
+
 }
