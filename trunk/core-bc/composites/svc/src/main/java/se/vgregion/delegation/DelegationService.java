@@ -1,68 +1,85 @@
 package se.vgregion.delegation;
 
-import org.joda.time.DateTime;
-import se.vgregion.delegation.domain.Delegation;
-import se.vgregion.delegation.domain.HealthCareUnit;
-import se.vgregion.delegation.domain.VardEnhetInfo;
-
 import java.util.List;
-import java.util.Set;
+
+import se.vgregion.delegation.domain.Delegation;
+import se.vgregion.delegation.domain.DelegationBlock;
 
 /**
- * Created by IntelliJ IDEA.
- * User: david
- * Date: 10/10-11
- * Time: 16:43
+ * @author Simon Göransson
+ * @author Claes Lundahl
+ * 
  */
 public interface DelegationService {
     /**
-     * Fetch currently active delegations made by Verksamhets-Chef.
-     *
-     * @param vcVgrId - vgrId for Verksamhets-Chef
+     * Fetch currently active delegations for delegatedFor
+     * 
+     * @param delegatedFor
+     *            - Id
      * @return - the active delegation
      */
-    Delegation activeDelegations(String vcVgrId);
+    List<Delegation> getActiveDelegations(String delegatedFor);
 
     /**
-     * Fetch all delegations made by Verksamhets-Chef.
-     *
-     * @param vcVgrId - vgrId for Verksamhets-Chef
-     * @return - a list of all delegations
+     * Fetch currently inactive delegations for delegatedFor
+     * 
+     * @param delegatedFor
+     *            - Id
+     * @return - the inactive delegation
      */
-    List<Delegation> delegatedBy(String vcVgrId);
+    List<Delegation> getInActiveDelegations(String delegatedFor);
 
     /**
-     * Fetch the delegation made by Verksamhets-Chef, that where active on a specific date.
-     *
-     * @param vcVgrId - vgrId for Verksamhets-Chef
-     * @param on - the date
-     * @return - the delegations that where active on a specific date
+     * Fetch delegations for delegatedFor
+     * 
+     * @param delegatedFor
+     *            - Id
+     * @return - the inactive delegation
      */
-    Delegation delegatedBy(String vcVgrId, DateTime on);
-
-    Delegation pendingDelegation(String vcVgrId);
-
-    List<Delegation> delegatedTo(String vgrId);
-
-    boolean approve(Delegation delegation, String signToken);
+    List<Delegation> getDelegations(String delegatedFor);
 
     /**
-     * Convenience method to extend an existing Delegation.
-     * The new Delegation has to be signed to be valid.
-     *
-     * @param oldDelegationId
-     * @param createdBy
-     * @param newFrom
-     * @param newTo
+     * Fetch delegations for delegatedTo and
+     * 
+     * @param delegatedTo
+     *            - Id
+     * @param role
+     *            - role
+     * 
+     * @return - the inactive delegation
+     */
+    List<Delegation> getDelegationsByRole(String delegatedTo, String role);
+
+    /**
+     * Fetches a delegation by it's id.
+     * 
+     * @param delegationId
+     *            - the id off the delegation.
+     * 
+     * @return - the inactive delegation
+     */
+    Delegation getDelegation(Long delegationId);
+
+    /**
+     * Store the delegations and checks if the checksum is not null,
+     * 
+     * @param delegationBlock
+     *            - a delegationBlock
+     * 
+     * @return - true if checksum was valid.
+     */
+    boolean save(DelegationBlock delegationBlock);
+
+    /**
+     * Check if a delegatedTo have a valid delegation for a delegationFor whit a role.
+     * 
+     * @param delegatedFor
+     *            - delegation for
+     * @param delegatedTo
+     *            - delegation to
+     * @param role
+     *            - the role
      * @return
      */
-    Delegation extend(Long oldDelegationId, String createdBy, DateTime newFrom, DateTime newTo);
-
-    Delegation find(Long delegationId);
-
-    List<VardEnhetInfo> lookupVerksamhetsChefInfo(String vcVgrId);
-
-    Set<HealthCareUnit> findAllVardEnhet();
-
-    void save(Delegation delegation);
+    boolean hasDelegations(String delegatedFor, String delegatedTo, String role);
 }
