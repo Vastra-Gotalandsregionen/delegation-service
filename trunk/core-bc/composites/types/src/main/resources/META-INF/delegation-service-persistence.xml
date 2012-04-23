@@ -25,8 +25,6 @@
 	version="2.0">
   <persistence-unit name="delegation">
     <class>se.vgregion.delegation.domain.Delegation</class>
-    <class>se.vgregion.delegation.domain.DelegationTo</class>
-    <class>se.vgregion.delegation.domain.UppdragVardEnhet</class>
-    <class>se.vgregion.delegation.domain.UppdragVardEnhetAction</class>
+    <class>se.vgregion.delegation.domain.DelegationBlock</class>
   </persistence-unit>
 </persistence>

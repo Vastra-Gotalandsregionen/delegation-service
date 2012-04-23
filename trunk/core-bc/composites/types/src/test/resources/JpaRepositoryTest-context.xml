@@ -34,9 +34,7 @@
 
   <context:property-placeholder location="classpath:test-datasource.properties"/>
 
+  <bean id="delegationBlockRepository" class="se.vgregion.delegation.persistence.jpa.JpaDelegationBlockRepository"/>
   <bean id="delegationRepository" class="se.vgregion.delegation.persistence.jpa.JpaDelegationRepository"/>
-  <bean id="delegationToRepository" class="se.vgregion.delegation.persistence.jpa.JpaDelegationToRepository"/>
-  <bean id="uppdragVardEnhetRepository"
-        class="se.vgregion.delegation.persistence.jpa.JpaUppdragVardEnhetRepository"/>
 
 </beans>

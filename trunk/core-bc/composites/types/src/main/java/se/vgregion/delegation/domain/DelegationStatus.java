@@ -5,15 +5,10 @@ package se.vgregion.delegation.domain;
  */
 public enum DelegationStatus {
 
-    /** New delegation - not yet approved */
-    PENDING,
-
     /** Signed delegation - currently active (only one per VerksamhetsChef and OrganizationUnit) */
     ACTIVE,
 
-    /** Signed delegation - has at some time been active */
-    SUPERSEDED,
+    /** deleted delegation - has at some time been active */
+    DELETED;
 
-    /** Invalid Delegation - never signed and has never been active */
-    REJECTED;
 }

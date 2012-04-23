@@ -1,114 +1,127 @@
-/**
- * Copyright 2010 Västra Götalandsregionen
- *
- *   This library is free software; you can redistribute it and/or modify
- *   it under the terms of version 2.1 of the GNU Lesser General Public
- *   License as published by the Free Software Foundation.
- *
- *   This library is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU Lesser General Public License for more details.
- *
- *   You should have received a copy of the GNU Lesser General Public
- *   License along with this library; if not, write to the
- *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- *   Boston, MA 02111-1307  USA
- *
- */
-
 package se.vgregion.delegation.persistence.jpa;
 
-import org.joda.time.DateTime;
-import org.springframework.stereotype.Repository;
-import se.vgregion.dao.domain.patterns.repository.db.jpa.DefaultJpaRepository;
-import se.vgregion.delegation.domain.Delegation;
-import se.vgregion.delegation.domain.DelegationStatus;
-import se.vgregion.delegation.domain.DelegationTo;
-import se.vgregion.delegation.persistence.DelegationRepository;
-
-import javax.persistence.Query;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Query;
+
+import se.vgregion.dao.domain.patterns.repository.db.jpa.DefaultJpaRepository;
+import se.vgregion.delegation.domain.Delegation;
+import se.vgregion.delegation.domain.DelegationStatus;
+import se.vgregion.delegation.persistence.DelegationRepository;
+
 /**
- * Created by IntelliJ IDEA.
- * Created: 2011-10-18 11:29
- *
- * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
+ * 
+ * @author Simon Göransson
+ * @author Claes Lundahl
+ * 
  */
-@Repository
-public class JpaDelegationRepository extends DefaultJpaRepository<Delegation, Long>
-        implements DelegationRepository {
+public class JpaDelegationRepository extends DefaultJpaRepository<Delegation, Long> implements
+        DelegationRepository {
 
+    private static final String activeConstraint = "d.validTo >=:currentDate"
+            + " and d.validFrom <=:currentDate";
+
+    private static final String statusIsActiveConstraint = "d.status =:delegatedStatus";
+
+    @SuppressWarnings("unchecked")
     @Override
-    public Delegation activeDelegation(String vcVgrId) {
-        Date now = new Date();
-        String query = "SELECT d FROM Delegation d " +
-                "WHERE d.delegatedBy = :delegatedBy" +
-                " AND d.approvedOn < :time" +
-                " AND d.revokedOn IS NULL" +
-                " AND d.status = :active" +
-                "";
+    public List<Delegation> getActiveDelegations(String delegatedFor) {
+        String query =
+                "SELECT d FROM " + Delegation.class.getSimpleName() + " d "
+                        + "WHERE d.delegatedFor = :delegatedFor" + " and " + statusIsActiveConstraint
+                        + " and " + activeConstraint;
+
         Query q = entityManager.createQuery(query);
 
-        return (Delegation) q.setParameter("delegatedBy", vcVgrId)
-                .setParameter("time", now)
-                .setParameter("active", DelegationStatus.ACTIVE)
-                .getSingleResult();
+        q.setParameter("delegatedFor", delegatedFor);
+        addCurrentDateConstrintAndStatusIsActive(q);
+
+        return q.getResultList();
+
     }
 
     @Override
-    public List<Delegation> delegatedBy(String vcVgrId) {
-        String query = "SELECT d FROM Delegation d " +
-                "WHERE d.delegatedBy = :delegatedBy" +
-                "";
+    public List<Delegation> getInActiveDelegations(String delegatedFor) {
+        String query =
+                "SELECT d FROM " + Delegation.class.getSimpleName() + " d "
+                        + "WHERE d.delegatedFor = :delegatedFor" + " and " + statusIsActiveConstraint
+                        + " and not (" + activeConstraint + ")";
+
         Query q = entityManager.createQuery(query);
 
-        return q.setParameter("delegatedBy", vcVgrId).getResultList();
+        q.setParameter("delegatedFor", delegatedFor);
+        addCurrentDateConstrintAndStatusIsActive(q);
+        return q.getResultList();
     }
 
     @Override
-    public Delegation delegatedOn(String vcVgrId, Date time) {
-        String query = "SELECT d FROM Delegation d " +
-                "WHERE d.delegatedBy = :delegatedBy" +
-                " AND (" +
-                "  (d.approvedOn < :time AND d.revokedOn > :time AND d.status = :superseded)" +
-                "  OR (d.approvedOn < :time AND d.revokedOn IS NULL AND d.status = :active)" +
-                " )" +
-                "";
+    public List<Delegation> getDelegations(String delegatedFor) {
+        String query =
+                "SELECT d FROM " + Delegation.class.getSimpleName() + " d "
+                        + "WHERE d.delegatedFor = :delegatedFor" + " and " + statusIsActiveConstraint;
+
         Query q = entityManager.createQuery(query);
 
-        return (Delegation) q.setParameter("delegatedBy", vcVgrId)
-                .setParameter("time", time)
-                .setParameter("superseded", DelegationStatus.SUPERSEDED)
-                .setParameter("active", DelegationStatus.ACTIVE)
-                .getSingleResult();
+        q.setParameter("delegatedFor", delegatedFor);
+        q.setParameter("delegatedStatus", DelegationStatus.ACTIVE);
+
+        return q.getResultList();
     }
 
     @Override
-    public Delegation pendingDelegation(String vcVgrId) {
-        String query = "SELECT d FROM Delegation d " +
-                "WHERE d.delegatedBy = :delegatedBy" +
-                " AND d.status = :in_progress" +
-                "";
+    public List<Delegation> getDelegationsByRole(String delegatedTo, String role) {
+        String query =
+                "SELECT d FROM " + Delegation.class.getSimpleName() + " d "
+                        + "WHERE d.delegateTo = :delegateTo" + " and " + statusIsActiveConstraint
+                        + " and d.role =:role and " + activeConstraint;
+
         Query q = entityManager.createQuery(query);
 
-        return (Delegation) q.setParameter("delegatedBy", vcVgrId)
-                .setParameter("in_progress", DelegationStatus.PENDING)
-                .getSingleResult();
+        q.setParameter("delegateTo", delegatedTo);
+        addCurrentDateConstrintAndStatusIsActive(q);
+        q.setParameter("role", role);
+
+        return q.getResultList();
     }
 
     @Override
-    public Delegation clone(Delegation delegation) {
-        Delegation pending = new Delegation();
-        pending.setStatus(DelegationStatus.PENDING);
+    public Delegation getDelegation(Long delegationId) {
+        String query =
+                "SELECT d FROM " + Delegation.class.getSimpleName() + " d " + "WHERE d.id = :delegationId";
 
-        pending.setDelegatedBy(delegation.getDelegatedBy());
-        for (DelegationTo delegationTo: delegation.getDelegationsTo()) {
-            delegationTo.clearId();
-            pending.addDelegationTo(delegationTo);
-        }
-        return pending;
+        Query q = entityManager.createQuery(query);
+
+        q.setParameter("delegationId", delegationId);
+
+        return (Delegation) q.getSingleResult();
+    }
+
+    @Override
+    public boolean hasDelegations(String delegatedFor, String delegatedTo, String role) {
+
+        String query =
+                "SELECT d FROM " + Delegation.class.getSimpleName() + " d "
+                        + "WHERE d.delegateTo = :delegateTo and d.delegatedFor=:delegatedFor"
+                        + " and d.status =:delegatedStatus " + " and d.role =:role and " + activeConstraint
+                        + " and " + statusIsActiveConstraint;
+
+        Query q = entityManager.createQuery(query);
+        q.setParameter("delegateTo", delegatedTo);
+        q.setParameter("role", role);
+        q.setParameter("delegatedFor", delegatedFor);
+
+        addCurrentDateConstrintAndStatusIsActive(q);
+
+        return !q.getResultList().isEmpty();
+    }
+
+    protected Date getCurrentDate() {
+        return new Date();
+    }
+
+    private void addCurrentDateConstrintAndStatusIsActive(Query q) {
+        q.setParameter("delegatedStatus", DelegationStatus.ACTIVE);
+        q.setParameter("currentDate", getCurrentDate());
     }
 }
