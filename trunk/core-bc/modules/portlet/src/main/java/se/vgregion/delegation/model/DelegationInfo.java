@@ -1,6 +1,6 @@
 package se.vgregion.delegation.model;
 
-import se.vgregion.delegation.domain.Delegation;
+import se.vgregion.delegation.domain.DelegationBlock;
 import se.vgregion.delegation.domain.HealthCareUnit;
 import se.vgregion.delegation.domain.VardEnhetInfo;
 
@@ -16,31 +16,31 @@ public class DelegationInfo {
 
     private HealthCareUnit vardEnhet;
     private VardEnhetInfo vardEnhetInfo;
-    private Delegation delegation;
-    private Delegation activeDelegation;
-    private List<Delegation> delegationHistory;
+    private DelegationBlock delegation;
+    private DelegationBlock activeDelegation;
+    private List<DelegationBlock> delegationHistory;
 
-    public Delegation getActiveDelegation() {
+    public DelegationBlock getActiveDelegation() {
         return activeDelegation;
     }
 
-    public void setActiveDelegation(Delegation activeDelegation) {
+    public void setActiveDelegation(DelegationBlock activeDelegation) {
         this.activeDelegation = activeDelegation;
     }
 
-    public Delegation getDelegation() {
+    public DelegationBlock getDelegation() {
         return delegation;
     }
 
-    public void setDelegation(Delegation delegation) {
+    public void setDelegation(DelegationBlock delegation) {
         this.delegation = delegation;
     }
 
-    public List<Delegation> getDelegationHistory() {
+    public List<DelegationBlock> getDelegationHistory() {
         return delegationHistory;
     }
 
-    public void setDelegationHistory(List<Delegation> delegationHistory) {
+    public void setDelegationHistory(List<DelegationBlock> delegationHistory) {
         this.delegationHistory = delegationHistory;
     }
 

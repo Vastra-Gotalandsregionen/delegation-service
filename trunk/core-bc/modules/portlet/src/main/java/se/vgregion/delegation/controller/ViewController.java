@@ -88,7 +88,7 @@ public class ViewController {
             model.addAttribute("vcVgrId", vcVgrId);
             model.addAttribute("vardEnhetInfo", vardEnhetInfo);
 
-            Delegation activeDelegation = delegationService.activeDelegations(vcVgrId);
+            DelegationBlock activeDelegation = delegationService.getActiveDelegations(vcVgrId);
             model.addAttribute("activeDelegation", activeDelegation);
 
             return "activeDelegationView";
@@ -108,9 +108,9 @@ public class ViewController {
             model.addAttribute("vcVgrId", vcVgrId);
             model.addAttribute("vardEnhetInfo", vardEnhetInfo);
 
-            Delegation pendingDelegation = delegationService.pendingDelegation(vcVgrId);
+            DelegationBlock pendingDelegation = delegationService.pendingDelegation(vcVgrId);
             model.addAttribute("pendingDelegation", pendingDelegation);
-            model.addAttribute("delegationsToSize", pendingDelegation.getDelegationsTo().size());
+            model.addAttribute("delegationsToSize", pendingDelegation.getDelegations().size());
 
             return "pendingDelegationView";
         } catch (Exception ex) {
@@ -149,9 +149,9 @@ public class ViewController {
             Model model) {
         String vcVgrId = lookupUid(request);
 
-        Delegation pendingDelegation = delegationService.pendingDelegation(vcVgrId);
+        DelegationBlock pendingDelegation = delegationService.pendingDelegation(vcVgrId);
 
-        DelegationTo to = new DelegationTo();
+        Delegation to = new Delegation();
         to.setDelegateTo(vgrId);
         to.setDelegatedFor("UppdragsBeställning");
 
@@ -159,7 +159,7 @@ public class ViewController {
         to.setValidFrom(new Date(now.getMillis()));
         to.setValidTo(new Date(now.plusMonths(12).getMillis()));
 
-        pendingDelegation.addDelegationTo(to);
+        pendingDelegation.addDelegation(to);
 
         delegationService.save(pendingDelegation);
 
@@ -172,8 +172,8 @@ public class ViewController {
         try {
             String uid = lookupUid(request);
 
-            Delegation activeDelegation = delegationService.activeDelegations(uid);
-            Delegation pendingDelegation = delegationService.pendingDelegation(uid);
+            DelegationBlock activeDelegation = delegationService.getActiveDelegations(uid);
+            DelegationBlock pendingDelegation = delegationService.pendingDelegation(uid);
 
             List<VardEnhetInfo> vcInfoList = delegationService.lookupVerksamhetsChefInfo(uid);
 
@@ -196,7 +196,7 @@ public class ViewController {
         }
     }
 
-    private String responseUrlBuilder(PortletRequest request, Delegation pendingDelegation) throws UnknownHostException {
+    private String responseUrlBuilder(PortletRequest request, DelegationBlock pendingDelegation) throws UnknownHostException {
         String server = (StringUtils.isBlank(signResponseName) ?
                 InetAddress.getLocalHost().getHostName() : signResponseName);
         String path = signResponsePath.startsWith("/") ? signResponsePath.substring(1) : signResponsePath;
