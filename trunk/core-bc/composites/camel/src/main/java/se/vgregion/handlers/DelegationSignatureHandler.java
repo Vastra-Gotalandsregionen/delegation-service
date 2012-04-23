@@ -4,7 +4,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.springframework.transaction.annotation.Transactional;
 import se.vgregion.delegation.DelegationService;
-import se.vgregion.delegation.domain.Delegation;
+import se.vgregion.delegation.domain.DelegationBlock;
 import se.vgregion.signera.signature._1.SignatureEnvelope;
 
 import javax.annotation.Resource;
@@ -33,7 +33,7 @@ public class DelegationSignatureHandler implements SignatureHandler {
             // 1: resolve delegationId
             String correlationId = exchange.getIn().getHeader("correlationId", String.class);
             Long delegationId = exchange.getIn().getHeader("delegationId", Long.class);
-            Delegation delegation = delegationService.find(delegationId);
+            DelegationBlock delegation = delegationService.find(delegationId);
 
             // 2: validate signature and delegation
 

@@ -12,7 +12,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import se.vgregion.delegation.DelegationService;
-import se.vgregion.delegation.domain.Delegation;
+import se.vgregion.delegation.domain.DelegationBlock;
 
 import javax.annotation.Resource;
 
@@ -50,7 +50,7 @@ public class SignatureResponseRouteBuilderTest {
                 "<signature>Apa</signature>" +
                 "</signatureEnvelope>";
 
-        Delegation delegation = mock(Delegation.class);
+        DelegationBlock delegation = mock(DelegationBlock.class);
 
         when(mockDelegationService.find(eq(456L))).thenReturn(delegation);
 
@@ -84,7 +84,7 @@ public class SignatureResponseRouteBuilderTest {
                 "<signature>Apa</signature>" +
                 "</signatureEnvelope>";
 
-        Delegation delegation = mock(Delegation.class);
+        DelegationBlock delegation = mock(DelegationBlock.class);
 
         when(mockDelegationService.find(eq(456L))).thenThrow(new RuntimeException());
 
