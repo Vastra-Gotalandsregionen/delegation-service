@@ -1,41 +1,24 @@
-/**
- * Copyright 2010 Västra Götalandsregionen
- *
- *   This library is free software; you can redistribute it and/or modify
- *   it under the terms of version 2.1 of the GNU Lesser General Public
- *   License as published by the Free Software Foundation.
- *
- *   This library is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU Lesser General Public License for more details.
- *
- *   You should have received a copy of the GNU Lesser General Public
- *   License along with this library; if not, write to the
- *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- *   Boston, MA 02111-1307  USA
- *
- */
-
 package se.vgregion.delegation.persistence.jpa;
 
-import org.joda.time.DateTime;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Collection;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+
 import se.vgregion.delegation.domain.Delegation;
 import se.vgregion.delegation.persistence.DelegationRepository;
 
-import java.util.Collection;
-import java.util.Date;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
-
 /**
- * @author <a href="mailto:david.rosell@redpill-linpro.com">David Rosell</a>
+ * 
+ * @author Simon Göransson
+ * @author Claes Lundahl
+ * 
  */
 @ContextConfiguration("classpath:JpaRepositoryTest-context.xml")
 public class JpaDelegationRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
@@ -50,73 +33,46 @@ public class JpaDelegationRepositoryTest extends AbstractTransactionalJUnit4Spri
 
     @Test
     public void testFindAll() {
-        Collection<Delegation> delegations = delegationRepository.findAll();
-        assertEquals(9, delegations.size());
+        Collection<Delegation> delegationTos = delegationRepository.findAll();
+        assertEquals(3, delegationTos.size());
 
-        for (Delegation delegation: delegations) {
-            System.out.println(delegation);
+        for (Delegation delegationTo : delegationTos) {
+            System.out.println(delegationTo);
         }
     }
 
     @Test
-    public void testFindDelegatedOn() {
-        DateTime dateTime = new DateTime(2011, 9, 2, 10, 0, 0, 0);
-        Date on = new Date(dateTime.getMillis());
-        System.out.println(on);
-        Delegation delegation = delegationRepository.delegatedOn("delegatedBy", on);
+    public void testActiveDelegations() {
 
-        assertNotNull(delegation);
-        assertEquals(new Long(-1), delegation.getId());
-    }
-
-    @Test(expected = javax.persistence.NoResultException.class)
-    public void testFindDelegatedOn2() {
-        DateTime dateTime = new DateTime(2011, 8, 2, 10, 0, 0, 0);
-        Date on = new Date(dateTime.getMillis());
-        Delegation delegation = delegationRepository.delegatedOn("delegatedBy", on);
+        List<Delegation> delegation = delegationRepository.getActiveDelegations("df");
+        assertEquals(1, delegation.size());
     }
 
     @Test
-    public void testFindCurrentDelegation() {
-        Delegation delegation = delegationRepository.activeDelegation("delegatedBy");
+    public void testInActiveDelegations() {
 
-        assertNotNull(delegation);
-        assertEquals(new Long(-2), delegation.getId());
+        List<Delegation> delegation = delegationRepository.getInActiveDelegations("df");
+        assertEquals(1, delegation.size());
     }
 
     @Test
-    public void testFindCurrentDelegation2() {
-        Delegation delegation = delegationRepository.activeDelegation("delegatedBy2");
+    public void testDelegationsByRole() {
 
-        assertNotNull(delegation);
-        assertEquals(new Long(-7), delegation.getId());
-    }
-
-    @Test(expected = javax.persistence.NoResultException.class)
-    public void testFindCurrentDelegation3() {
-        Delegation delegation = delegationRepository.activeDelegation("delegatedBy3");
-    }
-
-    @Test(expected = javax.persistence.NonUniqueResultException.class)
-    public void testFindPendingDelegation() {
-        Delegation delegation = delegationRepository.pendingDelegation("delegatedBy");
-    }
-
-    @Test(expected = javax.persistence.NoResultException.class)
-    public void testFindPendingDelegation2() {
-        Delegation delegation = delegationRepository.pendingDelegation("delegatedBy2");
-    }
-
-    @Test(expected = javax.persistence.NoResultException.class)
-    public void testFindPendingDelegation3() {
-        Delegation delegation = delegationRepository.pendingDelegation("delegatedBy3");
+        List<Delegation> delegation = delegationRepository.getDelegationsByRole("dt", "role");
+        assertEquals(1, delegation.size());
     }
 
     @Test
-    public void testFindPendingDelegation4() {
-        Delegation delegation = delegationRepository.pendingDelegation("delegatedBy4");
+    public void testDelegation() {
 
-        assertNotNull(delegation);
-        assertEquals(new Long(-9), delegation.getId());
+        Delegation delegation = delegationRepository.getDelegation(-1L);
+        assertEquals("df", delegation.getDelegatedFor());
+    }
+
+    @Test
+    public void testhasDelegations() {
+
+        boolean b = delegationRepository.hasDelegations("df", "dt", "role");
+        assertEquals(true, b);
     }
 }
